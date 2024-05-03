@@ -40,9 +40,9 @@ function addSphere() {
 }
 
 function removeSphere() {
-    if (spheres.length > 1) {
-        spheres.pop(); // Remove last sphere
-        updateSpheres(); // Update the canvas immediately
+    if (spheres.length > 0) { // Check if there are any spheres to remove
+        spheres.pop(); // Remove the last sphere
+        updateSpheres(); // Update the canvas immediately after removal
     }
 }
 
@@ -70,11 +70,13 @@ function draw() {
     ctx.setLineDash([]);
     ctx.fillStyle = 'blue';
 
-    spheres.forEach(sphere => {
-        ctx.beginPath();
-        ctx.arc(sphere.x + sphere.width / 2, sphere.y + sphere.height / 2, sphere.width / 2, 0, Math.PI * 2);
-        ctx.fill();
-    });
+    if (spheres.length > 0) { // Only draw if there are spheres
+        spheres.forEach(sphere => {
+            ctx.beginPath();
+            ctx.arc(sphere.x + sphere.width / 2, sphere.y + sphere.height / 2, sphere.width / 2, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
 }
 
 
@@ -161,20 +163,21 @@ function lerp(start, end, amt) {
 }
 
 function update() {
-    spheres.forEach(sphere => {
-        // Update reference angle continuously
-        sphere.refAngle += angularVelocity;
-        sphere.refAngle %= 2 * Math.PI;  // Normalize angle
+    if (spheres.length > 0) { // Only update if there are spheres
+        spheres.forEach(sphere => {
+            sphere.refAngle += angularVelocity;
+            sphere.refAngle %= 2 * Math.PI;  // Normalize angle
 
-        const intendedX = center.x + radius * Math.cos(sphere.refAngle) - sphere.width / 2;
-        const intendedY = center.y + radius * Math.sin(sphere.refAngle) - sphere.height / 2;
+            const intendedX = center.x + radius * Math.cos(sphere.refAngle) - sphere.width / 2;
+            const intendedY = center.y + radius * Math.sin(sphere.refAngle) - sphere.height / 2;
 
-        if (!sphere.dragging) {
-            // Gradually move the sphere towards the intended position
-            sphere.x = lerp(sphere.x, intendedX, 0.05);  // Adjust the 0.05 as needed to smooth or speed up the transition
-            sphere.y = lerp(sphere.y, intendedY, 0.05);
-        }
-    });
+            if (!sphere.dragging) {
+                // Gradually move the sphere towards the intended position
+                sphere.x = lerp(sphere.x, intendedX, 0.05);  // Adjust the 0.05 as needed to smooth or speed up the transition
+                sphere.y = lerp(sphere.y, intendedY, 0.05);
+            }
+        });
+    }
 
     draw();
 }
