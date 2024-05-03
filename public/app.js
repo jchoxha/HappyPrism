@@ -4,9 +4,10 @@ const ctx = canvas.getContext('2d');
 const MAX_VELOCITY = 650;  // Maximum pixels per second
 
 let spheres = [
-    { x: 100, y: 100, width: 75, height: 75, vx: 0, vy: 0, angle: 0, dragging: false }, // Initial sphere
-    { x: 300, y: 100, width: 75, height: 75, vx: 0, vy: 0, angle: Math.PI, dragging: false } // Second sphere
+    { x: 100, y: 100, width: 75, height: 75, vx: 0, vy: 0, angle: 0, refAngle: 0, dragging: false },
+    { x: 300, y: 100, width: 75, height: 75, vx: 0, vy: 0, angle: Math.PI, refAngle: Math.PI, dragging: false }
 ];
+
 
 
 let rect = { x: 100, y: 100, width: 150, height: 100, vx: 0, vy: 0 };
@@ -16,19 +17,14 @@ let draggingStartedWithinRectangle = false;
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw the orbital path
     ctx.beginPath();
-    ctx.setLineDash([5, 15]);  // Set the dash pattern for dotted line
-    ctx.strokeStyle = 'gray';  // Color of the orbital path
-    ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);  // Draw a full circle
+    ctx.setLineDash([5, 15]);
+    ctx.strokeStyle = 'gray';
+    ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
     ctx.stroke();
-
-    // Reset dash to solid line for other drawings
     ctx.setLineDash([]);
     ctx.fillStyle = 'blue';
 
-    // Draw each sphere
     spheres.forEach(sphere => {
         ctx.beginPath();
         ctx.arc(sphere.x + sphere.width / 2, sphere.y + sphere.height / 2, sphere.width / 2, 0, Math.PI * 2);
@@ -64,11 +60,8 @@ function mouseDown(e) {
 function mouseUp() {
     spheres.forEach(sphere => {
         if (sphere.dragging) {
-            calculateVelocity(sphere);
             sphere.dragging = false;
-            // Recalculate velocity based on the new angle to smoothly reintegrate into orbit
-            sphere.vx = angularVelocity * -Math.sin(sphere.angle) * radius;
-            sphere.vy = angularVelocity * Math.cos(sphere.angle) * radius;
+            // Velocity will be recalculated in the update function
         }
     });
 }
@@ -120,19 +113,37 @@ function calculateVelocity(sphere) {
 
 function update() {
     spheres.forEach(sphere => {
-        if (!sphere.dragging) {
-            const intendedX = center.x + radius * Math.cos(sphere.angle) - sphere.width / 2;
-            const intendedY = center.y + radius * Math.sin(sphere.angle) - sphere.height / 2;
+        // Update reference angle continuously
+        sphere.refAngle += angularVelocity;
+        sphere.refAngle %= 2 * Math.PI;  // Normalize angle
 
-            sphere.x += (intendedX - sphere.x) * 0.05;
-            sphere.y += (intendedY - sphere.y) * 0.05;
-            sphere.angle += angularVelocity;
+        // Calculate the intended position from the reference angle
+        const intendedX = center.x + radius * Math.cos(sphere.refAngle) - sphere.width / 2;
+        const intendedY = center.y + radius * Math.sin(sphere.refAngle) - sphere.height / 2;
+
+        if (!sphere.dragging) {
+            // Gradually move the sphere towards the intended position
+            if (Math.hypot(sphere.x - intendedX, sphere.y - intendedY) > 1) {
+                sphere.vx = (intendedX - sphere.x) * 0.1; // Smoother transition
+                sphere.vy = (intendedY - sphere.y) * 0.1;
+            } else {
+                // Snap to the intended position if very close
+                sphere.x = intendedX;
+                sphere.y = intendedY;
+                sphere.vx = 0;
+                sphere.vy = 0;
+            }
+
+            sphere.x += sphere.vx;
+            sphere.y += sphere.vy;
+
+            // Update angle to match the position
+            sphere.angle = Math.atan2(sphere.y + sphere.width / 2 - center.y, sphere.x + sphere.width / 2 - center.x);
         }
     });
 
     draw();
 }
-
 
 
 
