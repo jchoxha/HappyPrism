@@ -8,7 +8,52 @@ let spheres = [
     { x: 300, y: 100, width: 75, height: 75, vx: 0, vy: 0, angle: Math.PI, refAngle: Math.PI, dragging: false }
 ];
 
+document.getElementById('addSphere').addEventListener('click', () => {
+    addSphere();
+});
 
+document.getElementById('removeSphere').addEventListener('click', () => {
+    removeSphere();
+});
+
+function addSphere() {
+    const newAngle = 2 * Math.PI / (spheres.length + 1); // Calculate even spacing for new sphere
+    spheres.forEach((sphere, index) => {
+        sphere.angle = newAngle * index; // Reassign existing angles
+        sphere.refAngle = newAngle * index;
+    });
+
+    // Add new sphere at opposite angle
+    spheres.push({
+        x: center.x + radius * Math.cos(newAngle * spheres.length) - 75 / 2,
+        y: center.y + radius * Math.sin(newAngle * spheres.length) - 75 / 2,
+        width: 75,
+        height: 75,
+        vx: 0,
+        vy: 0,
+        angle: newAngle * spheres.length,
+        refAngle: newAngle * spheres.length,
+        dragging: false
+    });
+
+    updateSpheres(); // Update the canvas immediately
+}
+
+function removeSphere() {
+    if (spheres.length > 1) {
+        spheres.pop(); // Remove last sphere
+        updateSpheres(); // Update the canvas immediately
+    }
+}
+
+function updateSpheres() {
+    const angularSeparation = 2 * Math.PI / spheres.length;
+    spheres.forEach((sphere, index) => {
+        sphere.angle = angularSeparation * index;
+        sphere.refAngle = angularSeparation * index;
+    });
+    draw();
+}
 
 let rect = { x: 100, y: 100, width: 150, height: 100, vx: 0, vy: 0 };
 let drag = false;
@@ -61,7 +106,7 @@ function mouseUp() {
     spheres.forEach(sphere => {
         if (sphere.dragging) {
             sphere.dragging = false;
-            // Velocity will be recalculated in the update function
+            // No need to set velocities here, let the update function handle the smooth transition
         }
     });
 }
@@ -111,40 +156,28 @@ function calculateVelocity(sphere) {
     }
 }
 
+function lerp(start, end, amt) {
+    return (1 - amt) * start + amt * end;
+}
+
 function update() {
     spheres.forEach(sphere => {
         // Update reference angle continuously
         sphere.refAngle += angularVelocity;
         sphere.refAngle %= 2 * Math.PI;  // Normalize angle
 
-        // Calculate the intended position from the reference angle
         const intendedX = center.x + radius * Math.cos(sphere.refAngle) - sphere.width / 2;
         const intendedY = center.y + radius * Math.sin(sphere.refAngle) - sphere.height / 2;
 
         if (!sphere.dragging) {
             // Gradually move the sphere towards the intended position
-            if (Math.hypot(sphere.x - intendedX, sphere.y - intendedY) > 1) {
-                sphere.vx = (intendedX - sphere.x) * 0.1; // Smoother transition
-                sphere.vy = (intendedY - sphere.y) * 0.1;
-            } else {
-                // Snap to the intended position if very close
-                sphere.x = intendedX;
-                sphere.y = intendedY;
-                sphere.vx = 0;
-                sphere.vy = 0;
-            }
-
-            sphere.x += sphere.vx;
-            sphere.y += sphere.vy;
-
-            // Update angle to match the position
-            sphere.angle = Math.atan2(sphere.y + sphere.width / 2 - center.y, sphere.x + sphere.width / 2 - center.x);
+            sphere.x = lerp(sphere.x, intendedX, 0.05);  // Adjust the 0.05 as needed to smooth or speed up the transition
+            sphere.y = lerp(sphere.y, intendedY, 0.05);
         }
     });
 
     draw();
 }
-
 
 
 canvas.addEventListener('mousedown', mouseDown, false);
