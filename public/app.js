@@ -8,6 +8,15 @@ let shapes = [
     { x: 300, y: 100, width: 75, height: 75, vx: 0, vy: 0, angle: Math.PI, refAngle: Math.PI, dragging: false }
 ];
 
+const centralShape = {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    width: 100,
+    height: 100,
+    dragging: false
+};
+
+
 document.getElementById('addShape').addEventListener('click', () => {
     addShape();
 });
@@ -61,6 +70,10 @@ const angularVelocity = 0.001;
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Draw the central shape
+    ctx.fillStyle = 'red';  // Different color for distinction
+    ctx.fillRect(centralShape.x, centralShape.y, centralShape.width, centralShape.height);
+
     ctx.beginPath();
     ctx.setLineDash([5, 15]);
     ctx.strokeStyle = 'gray';
@@ -106,6 +119,13 @@ function mouseDown(e) {
     let mouseX = e.pageX - canvas.offsetLeft;
     let mouseY = e.pageY - canvas.offsetTop;
 
+    // Check if central shape is clicked
+    if (mouseX >= centralShape.x && mouseX <= centralShape.x + centralShape.width &&
+        mouseY >= centralShape.y && mouseY <= centralShape.y + centralShape.height) {
+        centralShape.dragging = true;
+        return;
+    }
+
     shapes.forEach(shape => {
         const distance = Math.sqrt(Math.pow((mouseX - (shape.x + shape.width / 2)), 2) + Math.pow((mouseY - (shape.y + shape.height / 2)), 2));
         if (distance <= shape.width / 2) {
@@ -119,22 +139,27 @@ function mouseMove(e) {
     let mouseX = e.pageX - canvas.offsetLeft;
     let mouseY = e.pageY - canvas.offsetTop;
 
-    shapes.forEach(shape => {
-        if (shape.dragging) {
-            shape.x = mouseX - shape.width / 2;
-            shape.y = mouseY - shape.height / 2;
-        }
-    });
+    if (centralShape.dragging) {
+        centralShape.x = mouseX - centralShape.width / 2;
+        centralShape.y = mouseY - centralShape.height / 2;
+        center.x = centralShape.x + centralShape.width / 2;
+        center.y = centralShape.y + centralShape.height / 2;
+    } else {
+        shapes.forEach(shape => {
+            if (shape.dragging) {
+                shape.x = mouseX - shape.width / 2;
+                shape.y = mouseY - shape.height / 2;
+            }
+        });
+    }
 
     draw();
 }
 
 function mouseUp() {
+    centralShape.dragging = false;
     shapes.forEach(shape => {
-        if (shape.dragging) {
-            shape.dragging = false;
-            // The update function will take over to smoothly transition the shape back to the orbit
-        }
+        shape.dragging = false;
     });
 }
 
