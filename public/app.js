@@ -11,7 +11,7 @@ const ShapeType = {
 };
 
 class Node {
-    constructor(x, y, width, height, type, numSides = 0) {
+    constructor(x, y, width, height, shapeType) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -21,26 +21,29 @@ class Node {
         this.angle = 0;
         this.refAngle = 0;
         this.dragging = false;
-        this.type = type;
-        this.numSides = numSides;
+        this.shapeType = shapeType;
     }
 }
+
+
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const MAX_VELOCITY = 650;  // Maximum pixels per second
-const nodes = [];
 
-const centralNode = new Node(canvas.width / 2 - 50, canvas.height / 2 - 50, 100, 100, 'square');
+
 const radius = 200;
 const angularVelocity = 0.001;
 const center = { x: canvas.width / 2, y: canvas.height / 2 };
 let angle = 0;
 
-document.getElementById('addNode').addEventListener('click', () => addNode('circle'));
+document.getElementById('addNode').addEventListener('click', () => addNode(ShapeType.CIRCLE));
 document.getElementById('removeNode').addEventListener('click', removeNode);
 
-function addNode(type, numSides = 0) {
+const nodes = [];
+const centralNode = new Node(canvas.width / 2 - 50, canvas.height / 2 - 50, 100, 100, ShapeType.SQUARE);
+
+function addNode(shapeType) {
     const newAngle = 2 * Math.PI / (nodes.length + 1);
     nodes.forEach((node, index) => {
         node.angle = newAngle * index;
@@ -52,8 +55,7 @@ function addNode(type, numSides = 0) {
         centralNode.y + centralNode.height / 2 + radius * Math.sin(newAngle * nodes.length) - 75 / 2,
         75,
         75,
-        type,
-        numSides
+        shapeType
     );
     newNode.angle = newAngle * nodes.length;
     newNode.refAngle = newAngle * nodes.length;
@@ -79,13 +81,13 @@ function updateNodes() {
 
 function drawNode(ctx, node) {
     ctx.beginPath();
-    if (node.type === 'circle') {
+    if (node.shapeType.name === 'circle') {
         ctx.arc(node.x, node.y, node.width / 2, 0, 2 * Math.PI);
-    } else if (node.type === 'polygon' && node.numSides > 2) {
-        const step = 2 * Math.PI / node.numSides;
+    } else if (node.shapeType.numSides > 2) {
+        const step = 2 * Math.PI / node.shapeType.numSides;
         const radius = node.width / 2;
         ctx.moveTo(node.x + radius, node.y);
-        for (let i = 1; i <= node.numSides; i++) {
+        for (let i = 1; i <= node.shapeType.numSides; i++) {
             ctx.lineTo(node.x + radius * Math.cos(step * i), node.y + radius * Math.sin(step * i));
         }
     }
