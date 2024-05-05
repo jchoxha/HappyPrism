@@ -1,3 +1,15 @@
+const ShapeType = {
+    CIRCLE: { name: 'circle', numSides: 1 },
+    TRIANGLE: { name: 'triangle', numSides: 3 },
+    SQUARE: { name: 'square', numSides: 4 },
+    PENTAGON: { name: 'pentagon', numSides: 5 },
+    HEXAGON: { name: 'hexagon', numSides: 6 },
+    SEPTAGON: { name: 'septagon', numSides: 7 },
+    OCTAGON: { name: 'octagon', numSides: 8 },
+    NONAGON: { name: 'nonagon', numSides: 8 },
+    STAR: { name: 'star', numSides: 10 } // Adjust based on how you treat the sides of a star.
+};
+
 class Node {
     constructor(x, y, width, height, type, numSides = 0) {
         this.x = x;
