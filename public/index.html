@@ -9,10 +9,18 @@
 </head>
 <body>
     <canvas id="canvas"></canvas>
+    <div id="confirmation-modal" style="display:none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+      <div style="background: white; width: 300px; margin: 100px auto; padding: 20px; text-align: center;">
+          <p>Do you want to remove this node?</p>
+          <button id="remove-with-children">Remove this node and all its children</button>
+          <button id="remove-only-this">Remove only this node</button>
+          <button id="cancel-remove">Cancel</button>
+      </div>
+  </div>
     <div id="control-buttons">
-      <button id="add-node">+</button>
-      <button id="remove-node">-</button>
+      <button class="node-add-sub-buttons" id="add-node">+</button>
+      <button class="node-add-sub-buttons" id="remove-node">-</button>
     </div>
-    <script type="module" src="app.js"></script>
+    <script type="module" src="app.js?v=1"></script>
 </body>
 </html>

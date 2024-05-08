@@ -72,6 +72,7 @@ function isValidColor(strColor) {
   }
 
   function addNode(nodes, newNode) {
+    console.log("adding node");
     let angularSeparation = 0;
     if (newNode.parent) {
         const children = newNode.parent.children;
@@ -103,28 +104,54 @@ function isValidColor(strColor) {
 
 
 function removeNode(nodes, nodeToRemove) {
-    const index = nodes.indexOf(nodeToRemove);
-    if (index > -1) {
-        const parent = nodeToRemove.parent;
-        nodes.splice(index, 1);  // Remove the node from the main array
-
-        if (parent) {
-            // Remove from the parent's children array
-            const childIndex = parent.children.indexOf(nodeToRemove);
-            parent.children.splice(childIndex, 1);
-
-            // Recalculate angles for remaining children
-            const angularSeparation = 2 * Math.PI / parent.children.length;
-            parent.children.forEach((child, idx) => {
-                const newAngle = parent.angle + angularSeparation * idx;
-                child.intendedAngle = newAngle;
-                // Do not instantly set 'child.angle' to 'newAngle' to avoid jumps
-            });
+    // Helper function to recursively remove a node and its children
+    function recursiveRemove(node) {
+        // Recursively remove all children
+        node.children.slice().forEach(child => recursiveRemove(child));
+        // Remove the node from its parent's children array if it has a parent
+        if (node.parent) {
+            const childIndex = node.parent.children.indexOf(node);
+            if (childIndex > -1) {
+                node.parent.children.splice(childIndex, 1);
+            }
+        }
+        // Remove the node from the main array
+        const index = nodes.indexOf(node);
+        if (index > -1) {
+            nodes.splice(index, 1);
         }
     }
-    return nodes;
+
+    // Start recursive removal
+    recursiveRemove(nodeToRemove);
 }
 
+function removeOnlyParent(nodes, nodeToRemove) {
+    // Nullify the parent property of all children and make them independent
+    nodeToRemove.children.forEach(child => {
+        child.parent = null;  // Remove the parent link
+        // Reset movement properties that may depend on the parent
+        child.vx = 0;
+        child.vy = 0;
+        child.angle = 0;
+        child.intendedAngle = 0;
+        child.refAngle = 0;
+    });
+
+    // Remove the node from its parent's children array if it has a parent
+    if (nodeToRemove.parent) {
+        const childIndex = nodeToRemove.parent.children.indexOf(nodeToRemove);
+        if (childIndex > -1) {
+            nodeToRemove.parent.children.splice(childIndex, 1);
+        }
+    }
+
+    // Remove the node from the main nodes array
+    const index = nodes.indexOf(nodeToRemove);
+    if (index > -1) {
+        nodes.splice(index, 1);
+    }
+}
 
 function updateNodes(nodes) {
     nodes.forEach(node => {
@@ -143,4 +170,4 @@ function updateNodes(nodes) {
     });
 }
 
-export { Node, addNode, removeNode };
+export { Node, addNode, removeNode, removeOnlyParent };

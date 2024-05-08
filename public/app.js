@@ -1,5 +1,5 @@
 import { ShapeType } from './shapes.js';
-import { Node, addNode, removeNode } from './nodes.js';
+import { Node, addNode, removeNode, removeOnlyParent } from './nodes.js';
 import { CanvasManager } from './canvasManager.js';
 import { setupEventListeners } from './eventManager.js'
 import { physicsUpdate } from './physics.js'
@@ -26,23 +26,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     removeButton.addEventListener('click', () => {
+        const modal = document.getElementById('confirmation-modal');
         if (canvasManager.selectedNode) {
-            if (canvasManager.selectedNode.children.length > 0) {
-                const confirmation = confirm("Do you want to remove this node and all its children?");
-                if (confirmation) {
-                    // Remove the node and all its children
-                    canvasManager.nodes = canvasManager.nodes.filter(node => node.parent !== canvasManager.selectedNode && node !== canvasManager.selectedNode);
-                } else {
-                    // Nullify the parent property of all children and remove the node
-                    canvasManager.selectedNode.children.forEach(child => child.parent = null);
-                    canvasManager.nodes = canvasManager.nodes.filter(node => node !== canvasManager.selectedNode);
-                }
-            } else {
-                // Just remove the node if it has no children
-                canvasManager.nodes = canvasManager.nodes.filter(node => node !== canvasManager.selectedNode);
-            }
-            canvasManager.selectedNode = null;
-            canvasManager.draw();
+            modal.style.display = 'block'; // Show the modal
+    
+            document.getElementById('remove-with-children').onclick = () => {
+                removeNode(canvasManager.nodes, canvasManager.selectedNode);
+                canvasManager.selectedNode = null;
+                canvasManager.draw();
+                modal.style.display = 'none'; // Hide the modal
+            };
+    
+            document.getElementById('remove-only-this').onclick = () => {
+                removeOnlyParent(canvasManager.nodes, canvasManager.selectedNode);
+                canvasManager.selectedNode = null;
+                canvasManager.draw();
+                modal.style.display = 'none'; // Hide the modal
+            };
+    
+            document.getElementById('cancel-remove').onclick = () => {
+                modal.style.display = 'none'; // Hide the modal
+            };
         }
     });
    
