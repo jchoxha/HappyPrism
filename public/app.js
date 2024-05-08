@@ -1,54 +1,86 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize Fabric.js canvas
-  const canvas = new fabric.Canvas('canvas', {
-      width: 800,
-      height: 600,
-      backgroundColor: 'lightgrey'
-  });
+import { ShapeType } from './shapes.js';
+import { Node, addNode, removeNode } from './nodes.js';
+import { CanvasManager } from './canvasManager.js';
+import { setupEventListeners } from './eventManager.js'
+import { physicsUpdate } from './physics.js'
 
-  // Create a central node
-  const centralNode = new fabric.Circle({
-      radius: 50,
-      fill: 'red',
-      left: canvas.width / 2 - 50,  // Center the node
-      top: canvas.height / 2 - 50,
-      hasControls: false,  // Disable scaling controls
-      hasBorders: false    // Disable selection borders
-  });
+document.addEventListener('DOMContentLoaded', () => {
+    const canvasManager = new CanvasManager('canvas');
+    setupEventListeners(canvasManager);  // Assuming setupEventListeners is adapted to work with CanvasManager
 
-  centralNode.set({
-      selectable: true,
-      lockMovementX: false,
-      lockMovementY: false
-  });
+    addNode(canvasManager.nodes, new Node(150, 150, 50, ShapeType.CIRCLE, "red"));
 
-  // Add central node to canvas
-  canvas.add(centralNode);
-
-  // Update and render loop for animations (if needed)
-  function animate() {
-      // Here you can handle physics or other animations
-      canvas.renderAll();
-      fabric.util.requestAnimFrame(animate);
-  }
-
-  fabric.util.requestAnimFrame(animate);
-
-  // Example function to add new nodes on button click
-  document.getElementById('addNode').addEventListener('click', function() {
-      addNode();
-  });
-
-  function addNode() {
-      const node = new fabric.Circle({
-          radius: 30,
-          fill: 'blue',
-          left: Math.random() * (canvas.width - 60),  // Random position avoiding edges
-          top: Math.random() * (canvas.height - 60),
-          hasControls: false,
-          hasBorders: false
-      });
-
-      canvas.add(node);
-  }
+    function update() {
+        physicsUpdate(canvasManager);
+        canvasManager.draw();
+    }
+    function animate() {
+        update();
+        requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
 });
+
+
+
+// function updateNodes() {
+//     const angularSeparation = 2 * Math.PI / (nodes.length);
+//     nodes.forEach((node, index) => {
+//         node.angle = angularSeparation * index;
+//         node.refAngle = angularSeparation * index;
+//     });
+//     draw();
+// }
+
+
+// function draw() {
+//     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+//     ctx.fillStyle = 'red'; // Central node color
+//     ctx.fillRect(centralNode.x - centralNode.size / 2, centralNode.y - centralNode.size / 2, centralNode.size, centralNode.size); // Draw central node
+//     ctx.beginPath();
+//     ctx.setLineDash([5, 15]); // Style for the orbit circle
+//     ctx.strokeStyle = 'gray'; // Orbit circle color
+//     ctx.arc(centralNode.x, centralNode.y, radius, 0, 2 * Math.PI); // Draw orbit circle
+//     ctx.stroke();
+//     ctx.setLineDash([]); // Reset line dash style
+//     ctx.fillStyle = 'blue'; // Orbital nodes color
+//     nodes.forEach(node => drawNode(ctx, node)); // Draw each node
+
+//     // Draw window and canvas size
+//     ctx.font = '16px Arial'; // Set font for text
+//     ctx.fillStyle = 'black'; // Text color
+//     ctx.textAlign = 'left'; // Align text to the left
+//     ctx.fillText('Window Size: ' + window.innerWidth + ' x ' + window.innerHeight, 10, 20); // Display window size
+//     ctx.fillText('Canvas Size: ' + canvas.width + ' x ' + canvas.height, 10, 40); // Display canvas size
+// }
+
+// function getPolygonArea(numSides, radius) {
+//     if (numSides < 3) return 0; // not a polygon
+//     const sideLength = 2 * radius * Math.sin(Math.PI / numSides);
+//     const apothem = radius * Math.cos(Math.PI / numSides);
+//     return (numSides * sideLength * apothem) / 2;
+// }
+
+// function getNodeArea(node) {
+//     switch (node.shapeType.name) {
+//         case 'circle':
+//             return Math.PI * (node.size / 2) * (node.size / 2);
+//         case 'triangle':
+//             return getPolygonArea(3, node.size / 2);
+//         case 'square':
+//             return getPolygonArea(4, node.size / 2);
+//         case 'pentagon':
+//             return getPolygonArea(5, node.size / 2);
+//         case 'hexagon':
+//             return getPolygonArea(6, node.size / 2);
+//         case 'septagon':
+//             return getPolygonArea(7, node.size / 2);
+//         case 'octagon':
+//             return getPolygonArea(8, node.size / 2);
+//         case 'nonagon':
+//             return getPolygonArea(9, node.size / 2);
+//         default:
+//             console.error('Unknown shape type:', node.shapeType.name);
+//             return 0;
+//     }
+// }

@@ -2,25 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" 
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <link rel="stylesheet" href="styles.css">
     <title>Draggable Nodes</title>
 </head>
 <body>
-    <canvas id="canvas" width="800" height="600" style="border:1px solid #000000;"></canvas>
-    <button id="addNode">+</button>
-    <button id="removeNode">-</button>
-    <select id="shapeTypeSelect">
-        <option value="CIRCLE">Circle</option>
-        <option value="TRIANGLE">Triangle</option>
-        <option value="SQUARE">Square</option>
-        <option value="PENTAGON">Pentagon</option>
-        <option value="HEXAGON">Hexagon</option>
-        <option value="SEPTAGON">Septagon</option>
-        <option value="OCTAGON">Octagon</option>
-        <option value="NONAGON">Nonagon</option>
-    </select>
-    <div id="nodeInfo"></div>
-    <div id="nodeCount">Total Nodess: 0</div>
-    <script src="app.js"></script>
+    <canvas id="canvas"></canvas>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
