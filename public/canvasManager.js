@@ -23,8 +23,17 @@ class CanvasManager {
         this.canvas.height = window.innerHeight;
         this.centralNode.x = this.canvas.width / 2;
         this.centralNode.y = this.canvas.height / 2;
+       // this.updateControlButtonPosition();
         this.draw();  // Redraw after resizing
     }
+    
+    // updateControlButtonPosition() {
+    //     const controlButtons = document.getElementById('control-buttons');
+    //     if (controlButtons) {
+    //         controlButtons.style.top = '10px'; // maintain a 10px top margin
+    //         controlButtons.style.right = '10px'; // maintain a 10px right margin
+    //     }
+    // }
 
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -81,6 +90,8 @@ class CanvasManager {
         this.ctx.fillText(`Dragging: ${node.dragging}`, 10, 210);
         this.ctx.fillText(`dragOffsetX: ${node.dragOffsetX}`, 10, 230);
         this.ctx.fillText(`dragOffsetY: ${node.dragOffsetY}`, 10, 250);
+        //~~~~~
+        if (node.parent != null) {this.ctx.fillText(`Parent Node ID: ${node.parent.id}`, 10, 290);}
     }
 }
 

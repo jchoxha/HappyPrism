@@ -4,7 +4,7 @@ body {
     height: 100%;
     width: 100%;
     overflow: hidden; /* Prevents scrollbars from appearing */
-    position: relative;
+    position: absolute;
     background-color: #f0f0f0; /* Sets background color for visibility */
     box-sizing: border-box; /* Includes padding and border in the element's total width and height */
 }
@@ -13,9 +13,33 @@ canvas {
     position: absolute;
     top: 0;
     left: 0;
-    background-color: lightgrey; /* Corrected the syntax error by removing quotes */
+    background-color: lightgrey;
     width: 100vw; /* Ensures it takes the full viewport width */
     height: 100vh; /* Ensures it takes the full viewport height */
     border: none; /* Ensures no border is applied */
+    z-index: 1; /* Sets z-index to ensure it is stacked under control buttons */
     box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+}
+
+#control-buttons {
+    position: fixed;
+    right: 10px;
+    top: 10px;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+    pointer-events: none;
+}
+
+button {
+    position: static;
+    height: 5vh;
+    width: 5vh;
+    padding: 10px;
+    margin: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    pointer-events: auto;
+    background-color: #fff;
+    border: 1px solid #ccc;
 }

@@ -47,7 +47,7 @@ function checkCollision(node1, node2) {
 
     if (shape1.name === 'circle' && shape2.name === 'circle') {
         return circleCircleCollision(node1, node2);
-    } else if ((shape1name === 'circle' && shape2.isPolygon) || (shape2.name === 'circle' && shape1.isPolygon)) {
+    } else if ((shape1.name === 'circle' && shape2.isPolygon) || (shape2.name === 'circle' && shape1.isPolygon)) {
         return circlePolygonCollision(node1, node2);
     } else if (shape1.isPolygon && shape2.isPolygon) {
         return polygonPolygonCollision(node1, node2);

@@ -7,9 +7,8 @@ import { physicsUpdate } from './physics.js'
 document.addEventListener('DOMContentLoaded', () => {
     const canvasManager = new CanvasManager('canvas');
     setupEventListeners(canvasManager);  // Assuming setupEventListeners is adapted to work with CanvasManager
-
     addNode(canvasManager.nodes, new Node(150, 150, 50, ShapeType.CIRCLE, "red"));
-
+    addNode(canvasManager.nodes, new Node(250, 250, 50, ShapeType.CIRCLE, "blue", canvasManager.nodes[0]));
     function update() {
         physicsUpdate(canvasManager);
         canvasManager.draw();

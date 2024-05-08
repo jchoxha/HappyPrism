@@ -51,11 +51,13 @@ function isValidColor(strColor) {
     return s.color == strColor
   }
 
-function addNode(nodes, newNode) {
+  function addNode(nodes, newNode) {
+    //console.log(`Adding node: ${newNode.id}, Parent: ${newNode.parent ? newNode.parent.id : 'No Parent'}`);
     nodes.push(newNode);
     updateNodes(nodes);
     return nodes;
 }
+
 
 function removeNode(nodes) {
     if (nodes.length > 0) {

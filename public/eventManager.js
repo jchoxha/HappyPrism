@@ -25,17 +25,24 @@ function handleMouseDown(event, canvasManager) {
         canvasManager.selectedNode = canvasManager.centralNode;
         return;
     }
-    // Check each orbital node
-    canvasManager.nodes.forEach(node => {
+    let nodeFound = false;
+    // Reverse loop to check the most recently added nodes first
+    for (let i = canvasManager.nodes.length - 1; i >= 0; i--) {
+        const node = canvasManager.nodes[i];
         if (isMouseOver(offsetX, offsetY, node)) {
+            console.log(`Node clicked: ${node.fill}`); // Log which node is clicked
             node.dragging = true;
             node.dragOffsetX = offsetX - node.x;
             node.dragOffsetY = offsetY - node.y;
             canvasManager.selectedNode = node;
-            return;
+            nodeFound = true;
+            break; // Break the loop once a node is found
         }
-        else canvasManager.selectedNode = null;
-    });
+    }
+    if (!nodeFound) {
+        console.log("No node was selected"); // Log when no nodes are selected
+        canvasManager.selectedNode = null;
+    }
     
 }
 
