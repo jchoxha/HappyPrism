@@ -76,20 +76,22 @@ class CanvasManager {
     }
 
     drawNodeDetails(node) {
+        let y = 10;
         this.ctx.font = "16px Arial";
         this.ctx.fillStyle = "black";
-        this.ctx.fillText(`ID: ${node.id}`, 10, 30);
-        this.ctx.fillText(`X: ${node.x}`, 10, 50);
-        this.ctx.fillText(`Y: ${node.y}`, 10, 70);
-        this.ctx.fillText(`Size: ${node.size}`, 10, 90);
-        this.ctx.fillText(`Shape: ${node.shapeType.name}`, 10, 110);
-        this.ctx.fillText(`vx: ${node.vx}`, 10, 130);
-        this.ctx.fillText(`vy: ${node.vy}`, 10, 150);
-        this.ctx.fillText(`angle: ${node.angle}`, 10, 170);
-        this.ctx.fillText(`refAngle: ${node.refAngle}`, 10, 190);
-        this.ctx.fillText(`Dragging: ${node.dragging}`, 10, 210);
-        this.ctx.fillText(`dragOffsetX: ${node.dragOffsetX}`, 10, 230);
-        this.ctx.fillText(`dragOffsetY: ${node.dragOffsetY}`, 10, 250);
+        this.ctx.fillText(`ID: ${node.id}`, 10, y+20);
+        this.ctx.fillText(`X: ${node.x}`, 10, y+20);
+        this.ctx.fillText(`Y: ${node.y}`, 10, y+20);
+        this.ctx.fillText(`Size: ${node.size}`, 10, y+20);
+        this.ctx.fillText(`Shape: ${node.shapeType.name}`, 10, y+20);
+        this.ctx.fillText(`vx: ${node.vx}`, 10, y+20);
+        this.ctx.fillText(`vy: ${node.vy}`, 10, y+20);
+        this.ctx.fillText(`angle: ${node.angle}`, 10, y+20);
+        this.ctx.fillText(`intendedAngle: ${node.intendedAngle}`, 10, y+20);
+        this.ctx.fillText(`refAngle: ${node.refAngle}`, 10, y+20);
+        this.ctx.fillText(`Dragging: ${node.dragging}`, 10, y+20);
+        this.ctx.fillText(`dragOffsetX: ${node.dragOffsetX}`, 10, y+20);
+        this.ctx.fillText(`dragOffsetY: ${node.dragOffsetY}`, 10, y+20);
         //~~~~~
         if (node.parent != null) {this.ctx.fillText(`Parent Node ID: ${node.parent.id}`, 10, 290);}
     }

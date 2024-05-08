@@ -4,11 +4,50 @@ import { CanvasManager } from './canvasManager.js';
 import { setupEventListeners } from './eventManager.js'
 import { physicsUpdate } from './physics.js'
 
+
 document.addEventListener('DOMContentLoaded', () => {
     const canvasManager = new CanvasManager('canvas');
     setupEventListeners(canvasManager);  // Assuming setupEventListeners is adapted to work with CanvasManager
-    addNode(canvasManager.nodes, new Node(150, 150, 50, ShapeType.CIRCLE, "red"));
-    addNode(canvasManager.nodes, new Node(250, 250, 50, ShapeType.CIRCLE, "blue", canvasManager.nodes[0]));
+    //addNode(canvasManager.nodes, new Node(150, 150, 50, ShapeType.CIRCLE, "red"));
+    //addNode(canvasManager.nodes, new Node(250, 250, 50, ShapeType.CIRCLE, "blue", canvasManager.nodes[0]));
+   
+    const addButton = document.getElementById('add-node');
+    const removeButton = document.getElementById('remove-node');
+
+    addButton.addEventListener('click', () => {
+        // If no node is selected, add a new node without a parent
+        if (!canvasManager.selectedNode) {
+            addNode(canvasManager.nodes, new Node(Math.random() * canvas.width, Math.random() * canvas.height, 50, ShapeType.CIRCLE, "randomColor"));
+        } else {
+            // Add a child node to the selected node
+            addNode(canvasManager.nodes, new Node(canvasManager.selectedNode.x + 100, canvasManager.selectedNode.y + 100, 50, ShapeType.CIRCLE, "randomColor", canvasManager.selectedNode));
+        }
+        canvasManager.draw();
+    });
+
+    removeButton.addEventListener('click', () => {
+        if (canvasManager.selectedNode) {
+            if (canvasManager.selectedNode.children.length > 0) {
+                const confirmation = confirm("Do you want to remove this node and all its children?");
+                if (confirmation) {
+                    // Remove the node and all its children
+                    canvasManager.nodes = canvasManager.nodes.filter(node => node.parent !== canvasManager.selectedNode && node !== canvasManager.selectedNode);
+                } else {
+                    // Nullify the parent property of all children and remove the node
+                    canvasManager.selectedNode.children.forEach(child => child.parent = null);
+                    canvasManager.nodes = canvasManager.nodes.filter(node => node !== canvasManager.selectedNode);
+                }
+            } else {
+                // Just remove the node if it has no children
+                canvasManager.nodes = canvasManager.nodes.filter(node => node !== canvasManager.selectedNode);
+            }
+            canvasManager.selectedNode = null;
+            canvasManager.draw();
+        }
+    });
+   
+   
+   
     function update() {
         physicsUpdate(canvasManager);
         canvasManager.draw();

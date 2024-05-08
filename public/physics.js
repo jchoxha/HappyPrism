@@ -3,31 +3,33 @@
 
 //~~~~Global Properties~~~~//
 const MAX_VELOCITY = 650;  // Maximum pixels per second
-const radius = 200;
 const angularVelocity = 0.01;
 const center = { x: canvas.width / 2, y: canvas.height / 2 };
 let angle = 0;
 
 //~~~~Physics Functions~~~~//
-function physicsUpdate(canvasManager){
+function physicsUpdate(canvasManager) {
     const nodes = canvasManager.nodes;
-    const centerX = canvasManager.centralNode.x;
-    const centerY = canvasManager.centralNode.y;
 
     nodes.forEach(node => {
-        node.refAngle += angularVelocity;
-        node.refAngle %= 2 * Math.PI; // Normalize the angle
-
-        const intendedX = centerX + radius * Math.cos(node.refAngle);
-        const intendedY = centerY + radius * Math.sin(node.refAngle);
-
         if (!node.dragging) {
-            node.x = lerp(node.x, intendedX, 0.05);
-            node.y = lerp(node.y, intendedY, 0.05);
+            // Check if the node has a parent to orbit around
+            if (node.parent) {
+                node.refAngle += angularVelocity; // angularVelocity should be defined globally or passed here
+                node.refAngle %= 2 * Math.PI; // Normalize the angle
+
+                // Position relative to parent node
+                const centerX = node.parent.x;
+                const centerY = node.parent.y;
+                const intendedX = centerX + node.parent.radius * Math.cos(node.refAngle); // radius can be node-specific or a fixed value
+                const intendedY = centerY + node.parent.radius * Math.sin(node.refAngle);
+
+                node.x = lerp(node.x, intendedX, 0.05); // Smooth transition using linear interpolation
+                node.y = lerp(node.y, intendedY, 0.05);
+            
+            }
         }
     });
-
-    detectCollisions(nodes)
 }
 
 //~~~~Collision Functions~~~~//
