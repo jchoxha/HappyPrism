@@ -5,12 +5,24 @@ import { setupEventListeners } from './eventManager.js'
 import { physicsUpdate } from './physics.js'
 
 
+function toggleDisplay(divId) {
+    const infoDiv = document.getElementById(divId);
+    if (infoDiv.style.display === 'none') {
+        infoDiv.style.display = 'block';
+    } else {
+        infoDiv.style.display = 'none';
+    }
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const canvasManager = new CanvasManager('canvas');
     setupEventListeners(canvasManager);
    
     const addButton = document.getElementById('add-node');
     const removeButton = document.getElementById('remove-node');
+    const toggleNodeDetails = document.getElementById('toggle-node-details');
+    const toggleCanvasDetails = document.getElementById('toggle-canvas-details');
 
     addButton.addEventListener('click', () => {
         // If no node is selected, add a new node without a parent
@@ -56,8 +68,17 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     });
-   
-   
+    if (toggleNodeDetails) {
+        toggleNodeDetails.addEventListener('click', () => {
+            canvasManager.toggleNodeDetails = !canvasManager.toggleNodeDetails;
+        });
+    }
+
+    if (toggleCanvasDetails) {
+        toggleCanvasDetails.addEventListener('click', () => {
+            canvasManager.toggleCanvasDetails = !canvasManager.toggleCanvasDetails;
+        });
+    }
    
     function update() {
         physicsUpdate(canvasManager);
@@ -69,4 +90,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     requestAnimationFrame(animate);
 });
+
 

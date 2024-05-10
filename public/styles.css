@@ -62,22 +62,31 @@ canvas {
     padding: 20px;
     text-align: center;
 }
-#node-info {
-    position: fixed; 
-    top: 10px; 
-    left: 10px; 
-    color: white; 
-    z-index: 10; 
-    background: rgba(0, 0, 0, 0.5); 
-    padding: 10px;
+
+#node-details, #canvas-details {
+    position: fixed;
+    color: white;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.5);
+    
 }
 
-#canvas-details{
-    position: fixed; 
-    bottom: 10px; 
-    right: 10px; 
-    color: white; 
-    z-index: 10; 
-    background: rgba(0, 0, 0, 0.5); 
+#node-details {
+    top: 10px;
+    left: 10px;
+}
+
+#toggle-canvas-details {
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+}
+
+#canvas-details {
+    bottom: 10px;
+    right: 10px;
+}
+
+#canvas-details-content{
     padding: 10px;
-} 
+}

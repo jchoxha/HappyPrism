@@ -6,6 +6,7 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <link rel="stylesheet" href="styles.css">
     <title>Draggable Nodes</title>
+    <script type="module" src="app.js" defer></script>
 </head>
 <body>
     <canvas id="canvas"></canvas>
@@ -21,8 +22,15 @@
       <button class="node-add-sub-buttons" id="add-node">+</button>
       <button class="node-add-sub-buttons" id="remove-node">-</button>
     </div>
-    <div id="node-info"></div>
-    <div id="canvas-details"></div>
-    <script type="module" src="app.js"></script>
+    <div id="node-details">
+      <button id="toggle-node-details">+</button>
+      <div id="node-details-content"></div>
+  </div>
+  <div id="canvas-details">
+      <div id="canvas-details-content"></div>
+      <button id="toggle-canvas-details">+</button>
+  </div>
+
+    
 </body>
 </html>

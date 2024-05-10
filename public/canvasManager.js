@@ -38,6 +38,11 @@ class CanvasManager {
         this.mouseLastMoveTime = null;
         this.mouseLastMovePos = { x: null, y: null };
 
+
+        //Display Objects Over Canvas
+        this.toggleNodeDetails = false;
+        this.toggleCanvasDetails = false;
+
         this.initCanvas();
     }
 
@@ -61,13 +66,18 @@ class CanvasManager {
         this.ctx.save();
         this.ctx.translate(this.translateX, this.translateY); // Center the canvas
         this.ctx.scale(this.scale, this.scale); // Apply current scale
-
+        this.updateCanvasRange()
         this.nodes.forEach(node => this.drawNode(node));
         if (this.highlightedNode) {
-            this.drawNodeDetails(this.highlightedNode);
+            if (this.toggleNodeDetails){
+                this.drawNodeDetails(this.highlightedNode);
+            }
+            else{this.drawNodeDetails();}
+        }
+        else{
+            this.drawNodeDetails();
         }
         this.ctx.restore();
-        this.updateCanvasRange();
         this.drawCanvasDetails()
     }
 
@@ -109,44 +119,56 @@ class CanvasManager {
         }
     }
 
-    drawNodeDetails(node) {
-        let detailsHtml = `ID: ${node.id}<br>
-                           X: ${node.x}<br>
-                           Y: ${node.y}<br>
-                           Size: ${node.size}<br>
-                           Shape: ${node.shapeType.name}<br>`;
-        document.getElementById('node-info').innerHTML = detailsHtml;
+    drawNodeDetails(node = null) {
+        let toggleNodeDetails  = "+";
+        let nodeDetailsContent  = "";
+            if(this.toggleNodeDetails && node){
+                toggleNodeDetails = "-";
+                nodeDetailsContent =
+                `ID: ${node.id}<br>
+                X: ${Math.round(node.x)}<br>
+                Y: ${Math.round(node.y)}<br>
+                Size: ${node.size}<br>
+                Shape: ${node.shapeType.name}<br>`;
+            }
+        document.getElementById('toggle-node-details').innerHTML = toggleNodeDetails;
+        document.getElementById('node-details-content').innerHTML = nodeDetailsContent;
     }
     
     drawCanvasDetails() {
-            
-        const canvasDetailsText = 
-                        `Canvas Details:<br>
-                        Width: ${this.canvas.width}<br>
-                        Height: ${this.canvas.height}<br>
-                        xCenter: ${this.xCenter}<br>
-                        yCenter: ${this.yCenter}<br>
-                        Scale: ${this.scale}<br>
-                        TranslateX: ${this.translateX}<br>
-                        TranslateY: ${this.translateY}<br>
+        let toggleCanvasDetails = "+";
+        let canvasDetailsContent = "";
+        if (this.toggleCanvasDetails){
+            toggleCanvasDetails = "-";
+            canvasDetailsContent = 
+                `Canvas Details:<br>
+                Width: ${this.canvas.width}<br>
+                Height: ${this.canvas.height}<br>
+                xCenter: ${this.xCenter}<br>
+                yCenter: ${this.yCenter}<br>
+                Scale: ${this.scale.toFixed(2)}<br>
+                TranslateX: ${this.translateX}<br>
+                TranslateY: ${this.translateY}<br>
 
-                        <br>Current Mouse Coords:<br>
-                        X: ${this.currentmousePos.x.toFixed(2)}<br>
-                        Y: ${this.currentmousePos.y.toFixed(2)}<br>
-                        <br>Mouse Down Coords:<br>
-                        X: ${this.mousePositionOnDown.x.toFixed(2)}<br>
-                        Y: ${this.mousePositionOnDown.y.toFixed(2)}<br>
-                        <br>Mouse Up Coords:<br>
-                        X: ${this.mousePositionOnUp.x.toFixed(2)}<br>
-                        Y: ${this.mousePositionOnUp.y.toFixed(2)}<br>
-                        <br>Mouse Drag Coords:<br>
-                        X: ${this.mousePositionOnDrag.x.toFixed(2)}<br>
-                        Y: ${this.mousePositionOnDrag.y.toFixed(2)}<br>
+                <br>Current Mouse Coords:<br>
+                X: ${this.currentmousePos.x.toFixed(2)}<br>
+                Y: ${this.currentmousePos.y.toFixed(2)}<br>
+                <br>Mouse Down Coords:<br>
+                X: ${this.mousePositionOnDown.x.toFixed(2)}<br>
+                Y: ${this.mousePositionOnDown.y.toFixed(2)}<br>
+                <br>Mouse Up Coords:<br>
+                X: ${this.mousePositionOnUp.x.toFixed(2)}<br>
+                Y: ${this.mousePositionOnUp.y.toFixed(2)}<br>
+                <br>Mouse Drag Coords:<br>
+                X: ${this.mousePositionOnDrag.x.toFixed(2)}<br>
+                Y: ${this.mousePositionOnDrag.y.toFixed(2)}<br>
 
-                        <br>View Range:<br>
-                        X: ${Math.round(this.topLeftX.toFixed(2))} to ${Math.round(this.bottomRightX.toFixed(2))}<br>
-                        Y: ${Math.round(this.topLeftY.toFixed(2))} to ${Math.round(this.bottomRightY.toFixed(2))}`;
-        document.getElementById('canvas-details').innerHTML = canvasDetailsText;
+                <br>View Range:<br>
+                X: ${Math.round(this.topLeftX.toFixed(2))} to ${Math.round(this.bottomRightX.toFixed(2))}<br>
+                Y: ${Math.round(this.topLeftY.toFixed(2))} to ${Math.round(this.bottomRightY.toFixed(2))}`;
+        }
+        document.getElementById('toggle-canvas-details').innerHTML = toggleCanvasDetails;
+        document.getElementById('canvas-details-content').innerHTML = canvasDetailsContent;
     }
 }
 
