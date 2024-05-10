@@ -62,3 +62,22 @@ canvas {
     padding: 20px;
     text-align: center;
 }
+#node-info {
+    position: fixed; 
+    top: 10px; 
+    left: 10px; 
+    color: white; 
+    z-index: 10; 
+    background: rgba(0, 0, 0, 0.5); 
+    padding: 10px;
+}
+
+#canvas-details{
+    position: fixed; 
+    bottom: 10px; 
+    right: 10px; 
+    color: white; 
+    z-index: 10; 
+    background: rgba(0, 0, 0, 0.5); 
+    padding: 10px;
+} 

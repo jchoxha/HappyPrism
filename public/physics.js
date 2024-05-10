@@ -4,6 +4,7 @@
 //~~~~Global Properties~~~~//
 const MAX_VELOCITY = 650;  // Maximum pixels per second
 const angularVelocity = 0.01;
+const deceleration = 0.90;
 const center = { x: canvas.width / 2, y: canvas.height / 2 };
 let angle = 0;
 
@@ -11,37 +12,95 @@ let angle = 0;
 function physicsUpdate(canvasManager) {
     const nodes = canvasManager.nodes;
 
+    // Handle node movement and physics
     nodes.forEach(node => {
+        const collisionDetected = detectAndHandleCollisions(nodes, node);
         if (!node.dragging) {
-            // Check if the node has a parent to orbit around
-            if (node.parent) {
-                node.refAngle += angularVelocity; // angularVelocity should be defined globally or passed here
-                node.refAngle %= 2 * Math.PI; // Normalize the angle
-
-                // Position relative to parent node
+            if(node.inMovementAfterDragging){
+                // Apply velocity to position
+                node.x += node.vx;
+                node.y += node.vy;
+                // Apply deceleration to velocity
+                node.vx *= deceleration;
+                node.vy *= deceleration;
+                // Optional: stop the node if velocity is very low
+                if (Math.abs(node.vx) < 0.1 && Math.abs(node.vy) < 0.1) {
+                    node.vx = 0;
+                    node.vy = 0;
+                    node.inMovementAfterDragging = false;
+                    console.log("Movement after dragging complete for: " + node);
+                    if (!node.inOrbit)
+                        {
+                            node.intendedX = node.x;
+                            node.intendedY = node.y;
+                        }
+                }
+                return;
+            }
+            else if (node.parent && !collisionDetected) {
+                node.refAngle += angularVelocity; 
+                node.refAngle %= 2 * Math.PI; 
                 const centerX = node.parent.x;
                 const centerY = node.parent.y;
-                const intendedX = centerX + node.parent.radius * Math.cos(node.refAngle); // radius can be node-specific or a fixed value
-                const intendedY = centerY + node.parent.radius * Math.sin(node.refAngle);
-
-                node.x = lerp(node.x, intendedX, 0.05); // Smooth transition using linear interpolation
-                node.y = lerp(node.y, intendedY, 0.05);
-            
+                node.intendedX= centerX + node.parent.radius * Math.cos(node.refAngle);
+                node.intendedY = centerY + node.parent.radius * Math.sin(node.refAngle);
             }
+            node.x = lerp(node.x, node.intendedX, 0.05);
+            node.y = lerp(node.y, node.intendedY, 0.05);
         }
     });
 }
 
-//~~~~Collision Functions~~~~//
-function detectCollisions(nodes) {
-    for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-            if (checkCollision(nodes[i], nodes[j])) {
-                console.log(`Collision detected between node ${i} and node ${j}`);
+function detectAndHandleCollisions(nodes, currentNode) {
+    let collisionOccurred = false;
+    nodes.forEach(node => {
+        if ( node!= currentNode){
+            if (checkCollision(currentNode, node)) {
+            handleCollision(currentNode, node);
+                collisionOccurred = true; 
             }
         }
-    }
+    });
+    return collisionOccurred;
 }
+
+function handleCollision(node1, node2) {
+    // Calculate the distance between the nodes
+    const dx = node1.x - node2.x;
+    const dy = node1.y - node2.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const totalRadius = node1.radius + node2.radius;
+
+    // Calculate the overlap
+    const overlap = 0.5 * (totalRadius - distance);
+
+    // Displace nodes away from each other based on their overlap
+    const displacementX = (overlap * (dx / distance));
+    const displacementY = (overlap * (dy / distance));
+
+    if (!node1.dragging){
+        node1.intendedX += displacementX;
+        node1.intendedY += displacementY;
+    }
+    if (!node2.dragging){
+        node2.intendedX -= displacementX;
+        node2.intendedY -= displacementY;
+    }
+
+}
+
+function isAncestorSelected(node, canvasManager) {
+    let currentNode = node.parent;  // Start checking from the parent of the given node.
+    while (currentNode !== null) {
+        if (currentNode === canvasManager.selectedNode) {
+            return true;  // An ancestor is the selected node.
+        }
+        currentNode = currentNode.parent;  // Move to the next parent in the hierarchy.
+    }
+    return false;  // No ancestors were the selected node.
+}
+
+//~~~~Collision Functions~~~~//
 
 function checkCollision(node1, node2) {
     const shape1 = node1.shapeType;
