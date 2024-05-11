@@ -2,7 +2,7 @@
 
 function setupEventListeners(canvasManager) {
     const events = ['mousedown', 'mouseup', 'mousemove', 'wheel'];
-    const touchEvents = ['touchstart', 'touchend', 'touchmove'];
+    const touchEvents = ['touchstart', 'touchend', 'touchmove', 'touchcancel'];
 
     events.forEach(event => {
         canvasManager.canvas.addEventListener(event, (event) => {
@@ -15,6 +15,46 @@ function setupEventListeners(canvasManager) {
             handleTouchEvent(event, canvasManager);
         }, { passive: false });
     });
+}
+
+let initialPinchDistance = null;
+let lastScale = 1;
+
+function handleTouchEvent(event, canvasManager) {
+    if (event.touches.length > 1) {
+        // Handle pinch
+        const touch1 = event.touches[0];
+        const touch2 = event.touches[1];
+
+        const dx = touch2.clientX - touch1.clientX;
+        const dy = touch2.clientY - touch1.clientY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (event.type === 'touchmove') {
+            if (initialPinchDistance != null) {
+                const scaleRatio = distance / initialPinchDistance;
+                const newScale = lastScale * scaleRatio;
+                canvasManager.scale = Math.max(0.1, Math.min(newScale, 10)); // Adjust limits as necessary
+                canvasManager.draw();
+            }
+        } else if (event.type === 'touchstart') {
+            initialPinchDistance = distance;
+            lastScale = canvasManager.scale;
+        }
+
+        event.preventDefault(); // Prevent the browser from doing its default pinch-to-zoom
+    } else if (event.touches.length === 1 && event.type !== 'touchend' && event.type !== 'touchcancel') {
+        // Normalize touch events to behave like mouse events for single touch
+        const touch = event.touches[0];
+        event.clientX = touch.clientX;
+        event.clientY = touch.clientY;
+        handleEvent(event, canvasManager);
+    }
+
+    if (event.type === 'touchend' || event.type === 'touchcancel') {
+        initialPinchDistance = null;
+        handleEnd(event, canvasManager);
+    }
 }
 
 function handleEvent(event, canvasManager) {
@@ -37,18 +77,10 @@ function handleEvent(event, canvasManager) {
     }
 }
 
-function handleTouchEvent(event, canvasManager) {
-    // Normalize touch events to behave like mouse events
-    if (event.touches.length > 0) {
-        const touch = event.touches[0];
-        event.clientX = touch.clientX;
-        event.clientY = touch.clientY;
-    }
-    handleEvent(event, canvasManager);
-}
 
 function handleStart(event, canvasManager) {
-    const { offsetX, offsetY } = event;
+    const { clientX, clientY } = event;
+    const { offsetX, offsetY } = getOffsets(clientX, clientY, canvasManager.canvas);
     let nodeFound = false;
     canvasManager.mousePositionOnDown = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y }
     console.log("Mouse down at: ", canvasManager.mousePositionOnDown);
@@ -117,6 +149,8 @@ function handleEnd(event, canvasManager) {
 }
 
 function handleMove(event, canvasManager) {
+    const { clientX, clientY } = event;
+    const { offsetX, offsetY } = getOffsets(clientX, clientY, canvasManager.canvas);
 
     if (canvasManager.draggingCanvas) {
         const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnDrag.x) * canvasManager.scale;
@@ -179,6 +213,14 @@ function shouldPreventDefault(event, canvasManager) {
     const y = event.clientY - rect.top;
     // Add more conditions as needed to decide when to prevent default
     return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
+}
+
+function getOffsets(clientX, clientY, canvas) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+        offsetX: clientX - rect.left,
+        offsetY: clientY - rect.top
+    };
 }
 
 export { setupEventListeners };
