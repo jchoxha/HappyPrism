@@ -147,25 +147,25 @@ class CanvasManager {
                 xCenter: ${this.xCenter}<br>
                 yCenter: ${this.yCenter}<br>
                 Scale: ${this.scale.toFixed(2)}<br>
-                TranslateX: ${this.translateX}<br>
-                TranslateY: ${this.translateY}<br>
+                TranslateX: ${this.translateX.toFixed(0)}<br>
+                TranslateY: ${this.translateY.toFixed(0)}<br>
 
                 <br>Current Mouse Coords:<br>
-                X: ${this.currentmousePos.x.toFixed(2)}<br>
-                Y: ${this.currentmousePos.y.toFixed(2)}<br>
+                X: ${this.currentmousePos.x.toFixed(0)}<br>
+                Y: ${this.currentmousePos.y.toFixed(0)}<br>
                 <br>Mouse Down Coords:<br>
-                X: ${this.mousePositionOnDown.x.toFixed(2)}<br>
-                Y: ${this.mousePositionOnDown.y.toFixed(2)}<br>
+                X: ${this.mousePositionOnDown.x.toFixed(0)}<br>
+                Y: ${this.mousePositionOnDown.y.toFixed(0)}<br>
                 <br>Mouse Up Coords:<br>
-                X: ${this.mousePositionOnUp.x.toFixed(2)}<br>
-                Y: ${this.mousePositionOnUp.y.toFixed(2)}<br>
+                X: ${this.mousePositionOnUp.x.toFixed(0)}<br>
+                Y: ${this.mousePositionOnUp.y.toFixed(0)}<br>
                 <br>Mouse Drag Coords:<br>
-                X: ${this.mousePositionOnDrag.x.toFixed(2)}<br>
-                Y: ${this.mousePositionOnDrag.y.toFixed(2)}<br>
+                X: ${this.mousePositionOnDrag.x.toFixed(0)}<br>
+                Y: ${this.mousePositionOnDrag.y.toFixed(0)}<br>
 
                 <br>View Range:<br>
-                X: ${Math.round(this.topLeftX.toFixed(2))} to ${Math.round(this.bottomRightX.toFixed(2))}<br>
-                Y: ${Math.round(this.topLeftY.toFixed(2))} to ${Math.round(this.bottomRightY.toFixed(2))}`;
+                X: ${Math.round(this.topLeftX.toFixed(0))} to ${Math.round(this.bottomRightX.toFixed(2))}<br>
+                Y: ${Math.round(this.topLeftY.toFixed(0))} to ${Math.round(this.bottomRightY.toFixed(2))}`;
         }
         document.getElementById('toggle-canvas-details').innerHTML = toggleCanvasDetails;
         document.getElementById('canvas-details-content').innerHTML = canvasDetailsContent;
