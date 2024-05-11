@@ -1,22 +1,53 @@
 // eventManager.js
 
 function setupEventListeners(canvasManager) {
-    canvasManager.canvas.addEventListener('mousedown', (event) => {
-        handleMouseDown(event, canvasManager);
+    const events = ['mousedown', 'mouseup', 'mousemove', 'wheel'];
+    const touchEvents = ['touchstart', 'touchend', 'touchmove'];
+
+    events.forEach(event => {
+        canvasManager.canvas.addEventListener(event, (event) => {
+            handleEvent(event, canvasManager);
+        }, { passive: false });
     });
 
-    canvasManager.canvas.addEventListener('mouseup', (event) => {
-        handleMouseUp(event, canvasManager);
+    touchEvents.forEach(event => {
+        canvasManager.canvas.addEventListener(event, (event) => {
+            handleTouchEvent(event, canvasManager);
+        }, { passive: false });
     });
-
-    canvasManager.canvas.addEventListener('mousemove', (event) => {
-        handleMouseMove(event, canvasManager);
-    });
-    canvasManager.canvas.addEventListener('wheel', event => handleWheel(event, canvasManager), { passive: false });
-
 }
 
-function handleMouseDown(event, canvasManager) {
+function handleEvent(event, canvasManager) {
+    switch (event.type) {
+        case 'mousedown':
+        case 'touchstart':
+            handleStart(event, canvasManager);
+            break;
+        case 'mouseup':
+        case 'touchend':
+            handleEnd(event, canvasManager);
+            break;
+        case 'mousemove':
+        case 'touchmove':
+            handleMove(event, canvasManager);
+            break;
+        case 'wheel':
+            handleWheel(event, canvasManager);
+            break;
+    }
+}
+
+function handleTouchEvent(event, canvasManager) {
+    // Normalize touch events to behave like mouse events
+    if (event.touches.length > 0) {
+        const touch = event.touches[0];
+        event.clientX = touch.clientX;
+        event.clientY = touch.clientY;
+    }
+    handleEvent(event, canvasManager);
+}
+
+function handleStart(event, canvasManager) {
     const { offsetX, offsetY } = event;
     let nodeFound = false;
     canvasManager.mousePositionOnDown = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y }
@@ -64,7 +95,7 @@ function handleMouseDown(event, canvasManager) {
     }
 }
 
-function handleMouseUp(event, canvasManager) {
+function handleEnd(event, canvasManager) {
     canvasManager.mousePositionOnUp = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y }
     console.log("Mouse up at: ", canvasManager.mousePositionOnUp);
     canvasManager.draggingCanvas = false;
@@ -85,7 +116,7 @@ function handleMouseUp(event, canvasManager) {
     });
 }
 
-function handleMouseMove(event, canvasManager) {
+function handleMove(event, canvasManager) {
 
     if (canvasManager.draggingCanvas) {
         const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnDrag.x) * canvasManager.scale;
