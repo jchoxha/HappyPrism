@@ -144,12 +144,12 @@ class CanvasManager {
             //If we have not yet initialized the static content
             if(!this.nodeDetailsStaticContentInit){
                 this.nodeDetailsStaticContentInit = true;
-                nodeDetailsContentStatic = `<button id="toggle-position-fixed">${node.positionFixed ? "Unfix Position" : "Fix Position"}</button>`;
+                nodeDetailsContentStatic = `<button id="toggle-node-position-fixed">${node.positionFixed ? "Unfix Position" : "Fix Position"}</button>`;
 
                 document.getElementById('node-details-content-static').innerHTML = nodeDetailsContentStatic;
 
                 //Add any event listeners to the static content 
-                const positionToggleButton = document.getElementById('toggle-position-fixed');
+                const positionToggleButton = document.getElementById('toggle-node-position-fixed');
                 positionToggleButton.onclick = () => {
                     console.log("test");
                     node.positionFixed = !node.positionFixed;

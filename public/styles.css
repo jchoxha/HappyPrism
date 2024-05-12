@@ -65,6 +65,7 @@ canvas {
     color: white;
     z-index: 10;
     background: rgba(0, 0, 0, 0.5);
+    pointer-events: none;
     
 }
 
@@ -74,14 +75,17 @@ canvas {
 }
 
 #toggle-node-details {
+    pointer-events: auto;
     cursor: pointer;
 }
 
-#toggle-position-fixed {
+#toggle-node-position-fixed {
+    pointer-events: auto;
     cursor: pointer;
 }
 
 #toggle-canvas-details {
+    pointer-events: auto;
     cursor: pointer;
     position: fixed;
     right: 10px;
