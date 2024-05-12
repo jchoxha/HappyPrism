@@ -14,6 +14,7 @@ class Node {
     this.radius = size * radiusMult;
     this.angle = this.intendedAngle = this.refAngle = 0;
     this.dragging = this.inMovementAfterDragging = this.inOrbit = false;
+    this.positionFixed = true;
     this.positionOnDragStart = { x: 0, y: 0 };
     this.dragOffsetX = this.dragOffsetY = 0;
     this.parent = parent;
@@ -70,10 +71,20 @@ function addNode(canvasManager, newNodeParent = null) {
   const defaultShapeType = ShapeType.CIRCLE;
   const defaultFill = "randomColor";
   const startingPosition = canvasManager.mousePositionOnDown || { x: canvasManager.xCenter, y: canvasManager.yCenter };
+  if(newNodeParent){
+    startingPosition.y = newNodeParent.y - (newNodeParent.radius)
+  }
   const newNode = new Node(startingPosition.x, startingPosition.y, defaultSize, defaultShapeType, defaultFill, newNodeParent);
+
 
   console.log("Adding node:", newNode);
   canvasManager.nodes.push(newNode);
+  if(!canvasManager.toggleNodeDetails) {
+    canvasManager.toggleNodeDetails = !canvasManager.toggleNodeDetails;
+  }
+  if (canvasManager.nodes.length == 1) {
+    canvasManager.highlightedNode = canvasManager.nodes[0];
+  }
   return newNode;
 }
 

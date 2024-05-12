@@ -5,16 +5,6 @@ import { setupEventListeners } from './eventManager.js'
 import { physicsUpdate } from './physics.js'
 
 
-function toggleDisplay(divId) {
-    const infoDiv = document.getElementById(divId);
-    if (infoDiv.style.display === 'none') {
-        infoDiv.style.display = 'block';
-    } else {
-        infoDiv.style.display = 'none';
-    }
-}
-
-
 document.addEventListener('DOMContentLoaded', () => {
     const canvasManager = new CanvasManager('canvas');
     setupEventListeners(canvasManager);
@@ -71,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (toggleNodeDetails) {
         toggleNodeDetails.addEventListener('click', () => {
             canvasManager.toggleNodeDetails = !canvasManager.toggleNodeDetails;
-        });
+        });        
     }
 
     if (toggleCanvasDetails) {

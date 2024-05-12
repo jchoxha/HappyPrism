@@ -33,9 +33,6 @@ canvas {
 
 .node-add-sub-buttons {
     position: static;
-    height: 5vh;
-    width: 5vh;
-    padding: 10px;
     margin: 5px;
     font-size: 16px;
     cursor: pointer;
@@ -76,7 +73,16 @@ canvas {
     left: 10px;
 }
 
+#toggle-node-details {
+    cursor: pointer;
+}
+
+#toggle-position-fixed {
+    cursor: pointer;
+}
+
 #toggle-canvas-details {
+    cursor: pointer;
     position: fixed;
     right: 10px;
     bottom: 10px;
@@ -90,3 +96,4 @@ canvas {
 #canvas-details-content{
     padding: 10px;
 }
+

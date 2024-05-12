@@ -41,6 +41,8 @@ class CanvasManager {
 
         //Display Objects Over Canvas
         this.toggleNodeDetails = false;
+        this.nodeDetailsStaticContentInit = false; //Are we done initializing the static content?
+
         this.toggleCanvasDetails = false;
 
         this.initCanvas();
@@ -120,19 +122,51 @@ class CanvasManager {
     }
 
     drawNodeDetails(node = null) {
+        //Default Values
         let toggleNodeDetails  = "+";
-        let nodeDetailsContent  = "";
-            if(this.toggleNodeDetails && node){
-                toggleNodeDetails = "-";
-                nodeDetailsContent =
-                `ID: ${node.id}<br>
+        let nodeDetailsContentDynamic  = "";
+        let nodeDetailsContentStatic  = "";
+
+        //If we want to see the node details and have highlighted a node
+        if (this.toggleNodeDetails && node) {
+            //Set and print the dynamic values
+            toggleNodeDetails = "-";
+            nodeDetailsContentDynamic = `
+                ID: ${node.id}<br>
                 X: ${Math.round(node.x)}<br>
                 Y: ${Math.round(node.y)}<br>
                 Size: ${node.size}<br>
-                Shape: ${node.shapeType.name}<br>`;
+                Shape: ${node.shapeType.name}<br>
+                
+            `;
+            document.getElementById('node-details-content-dynamic').innerHTML = nodeDetailsContentDynamic;
+
+            //If we have not yet initialized the static content
+            if(!this.nodeDetailsStaticContentInit){
+                this.nodeDetailsStaticContentInit = true;
+                nodeDetailsContentStatic = `<button id="toggle-position-fixed">${node.positionFixed ? "Unfix Position" : "Fix Position"}</button>`;
+
+                document.getElementById('node-details-content-static').innerHTML = nodeDetailsContentStatic;
+
+                //Add any event listeners to the static content 
+                const positionToggleButton = document.getElementById('toggle-position-fixed');
+                positionToggleButton.onclick = () => {
+                    console.log("test");
+                    node.positionFixed = !node.positionFixed;
+                    positionToggleButton.textContent = node.positionFixed ? "Unfix Position" : "Fix Position";
+                    this.nodeDetailsStaticContentInit = false;
+                };
             }
+        }
+        //If we do not want to see the node details and/or we do not have highlighted a node
+        else {
+            this.toggleNodeDetails = false;
+            this.nodeDetailsStaticContentInit = false;
+            document.getElementById('node-details-content-dynamic').innerHTML = "";
+            document.getElementById('node-details-content-static').innerHTML = "";
+        }
+        //Set the minimize / maximize button based on the final state of the menu
         document.getElementById('toggle-node-details').innerHTML = toggleNodeDetails;
-        document.getElementById('node-details-content').innerHTML = nodeDetailsContent;
     }
     
     drawCanvasDetails() {

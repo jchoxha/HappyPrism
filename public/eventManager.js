@@ -98,6 +98,7 @@ function handleStart(event, canvasManager) {
             }
             else if (canvasManager.selectedNode != node) {
                 canvasManager.highlightedNode = node;
+                canvasManager.toggleNodeDetails = true;
                 console.log("Node highlighted: ", node);
             }
             if (canvasManager.selectedNode == node || canvasManager.selectedNode == node.parent && node.parent != null){
@@ -165,6 +166,10 @@ function handleMove(event, canvasManager) {
                 const dy = (canvasManager.currentmousePos.y - canvasManager.mousePositionOnDrag.y) * canvasManager.scale;
                 node.x += dx / canvasManager.scale; 
                 node.y += dy/ canvasManager.scale;
+                if(!node.positionFixed){
+                    node.intendedX = node.x;
+                    node.intendedY = node.y; 
+                }
                 // Update the base point for the next move
                 canvasManager.mousePositionOnDrag.x = canvasManager.currentmousePos.x;
                 canvasManager.mousePositionOnDrag.y = canvasManager.currentmousePos.y;
