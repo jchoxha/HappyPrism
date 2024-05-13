@@ -45,11 +45,12 @@ class CanvasManager {
 
         this.toggleCanvasDetails = false;
 
-        this.initCanvas();
+        this.theme = null;
     }
 
-    initCanvas() {
-        this.canvas.style.background = "lightgrey";
+    initCanvas(theme) {
+        this.theme = theme;
+        this.canvas.style.background = theme.canvas_background;
         this.resizeCanvas();
         window.addEventListener('resize', this.resizeCanvas.bind(this));
     }
@@ -143,19 +144,34 @@ class CanvasManager {
 
             //If we have not yet initialized the static content
             if(!this.nodeDetailsStaticContentInit){
+                console.log("Redrawing static content");
                 this.nodeDetailsStaticContentInit = true;
-                nodeDetailsContentStatic = `<button id="toggle-node-position-fixed">${node.positionFixed ? "Unfix Position" : "Fix Position"}</button>`;
+
+                //Set value for color picker, should equal nodes current color.
+
+
+                nodeDetailsContentStatic = `
+                    <button id="toggle-node-position-fixed">${node.positionFixed ? "Unfix Position" : "Fix Position"}</button><br>
+                    Fill color: <input id ="node-color-picker" value="${node.fill}" data-jscolor="{preset:'small dark', position:'right'}"> `;
 
                 document.getElementById('node-details-content-static').innerHTML = nodeDetailsContentStatic;
+
+
 
                 //Add any event listeners to the static content 
                 const positionToggleButton = document.getElementById('toggle-node-position-fixed');
                 positionToggleButton.onclick = () => {
-                    console.log("test");
                     node.positionFixed = !node.positionFixed;
                     positionToggleButton.textContent = node.positionFixed ? "Unfix Position" : "Fix Position";
                     this.nodeDetailsStaticContentInit = false;
                 };
+
+                const nodeColorPicker = document.getElementById('node-color-picker');
+                new jscolor(nodeColorPicker);
+                nodeColorPicker.addEventListener('input', function() {
+                    node.fill = nodeColorPicker.value;
+                    this.nodeDetailsStaticContentInit = false;
+                });
             }
         }
         //If we do not want to see the node details and/or we do not have highlighted a node

@@ -54,7 +54,7 @@ function physicsUpdate(canvasManager) {
 function detectAndHandleCollisions(nodes, currentNode) {
     let collisionOccurred = false;
     nodes.forEach(node => {
-        if ( node!= currentNode){
+        if ( node!= currentNode && node.parent != currentNode && currentNode.parent != node && currentNode.parent != node.parent){
             if (checkCollision(currentNode, node)) {
             handleCollision(currentNode, node);
                 collisionOccurred = true; 

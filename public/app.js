@@ -3,10 +3,14 @@ import { Node, addNode, removeNode, removeOnlyParent } from './nodes.js';
 import { CanvasManager } from './canvasManager.js';
 import { setupEventListeners } from './eventManager.js'
 import { physicsUpdate } from './physics.js'
+import { Theme } from './theme.js'
 
 
 document.addEventListener('DOMContentLoaded', () => {
+    const theme = new Theme();
+    theme.initTheme();
     const canvasManager = new CanvasManager('canvas');
+    canvasManager.initCanvas(theme);
     setupEventListeners(canvasManager);
    
     const addButton = document.getElementById('add-node');

@@ -48,7 +48,7 @@ class Node {
 
 function getRandomColor() {
   const [red, green, blue] = Array.from({ length: 3 }, () => Math.floor(Math.random() * 256));
-  return `rgb(${red}, ${green}, ${blue})`;
+  return `rgba(${red},${green},${blue},1)`;
 }
 
 function generateUUID() {
@@ -121,5 +121,6 @@ function removeOnlyParent(nodes, nodeToRemove) {
   }
   nodes.splice(nodes.indexOf(nodeToRemove), 1);
 }
+
 
 export { Node, addNode, removeNode, removeOnlyParent };

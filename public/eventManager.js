@@ -99,11 +99,15 @@ function handleStart(event, canvasManager) {
             else if (canvasManager.selectedNode != node) {
                 canvasManager.highlightedNode = node;
                 canvasManager.toggleNodeDetails = true;
+                canvasManager.nodeDetailsStaticContentInit = false;
                 console.log("Node highlighted: ", node);
             }
             if (canvasManager.selectedNode == node || canvasManager.selectedNode == node.parent && node.parent != null){
                 
                 node.dragging = true;
+                canvasManager.highlightedNode = node;
+                canvasManager.toggleNodeDetails = true;
+                canvasManager.nodeDetailsStaticContentInit = false;
                 canvasManager.mousePositionOnDrag.x = canvasManager.currentmousePos.x;
                 canvasManager.mousePositionOnDrag.y = canvasManager.currentmousePos.y;
             }
