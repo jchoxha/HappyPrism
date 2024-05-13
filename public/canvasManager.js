@@ -152,7 +152,7 @@ class CanvasManager {
 
                 nodeDetailsContentStatic = `
                     <button id="toggle-node-position-fixed">${node.positionFixed ? "Unfix Position" : "Fix Position"}</button><br>
-                    Fill color: <input id ="node-color-picker" value="${node.fill}" data-jscolor="{preset:'small dark', position:'right'}" readonly> `;
+                    Fill color: <input id ="node-color-picker" value="${node.fill}" data-jscolor="{preset:'small dark', position:'right'}" onclick="this.blur();"> `;
 
                 document.getElementById('node-details-content-static').innerHTML = nodeDetailsContentStatic;
 
