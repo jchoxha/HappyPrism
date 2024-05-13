@@ -90,7 +90,11 @@ function addNode(canvasManager, newNodeParent = null) {
 
 function removeNode(nodes, nodeToRemove) {
   function recursiveRemove(node) {
-    node.children.forEach(recursiveRemove);
+    // Create a copy of the children array to avoid modification issues during iteration
+    const childrenCopy = node.children.slice();
+    childrenCopy.forEach(child => recursiveRemove(child));
+
+    // Remove the node from its parent's children array
     const parentChildren = node.parent?.children;
     if (parentChildren) {
       const index = parentChildren.indexOf(node);
@@ -98,8 +102,14 @@ function removeNode(nodes, nodeToRemove) {
         parentChildren.splice(index, 1);
       }
     }
-    nodes.splice(nodes.indexOf(node), 1);
+
+    // Remove the node from the main nodes array
+    const nodeIndex = nodes.indexOf(node);
+    if (nodeIndex > -1) {
+      nodes.splice(nodeIndex, 1);
+    }
   }
+
   recursiveRemove(nodeToRemove);
 }
 
