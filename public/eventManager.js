@@ -160,8 +160,8 @@ function handleMove(event, canvasManager) {
     if (canvasManager.draggingCanvas) {
         const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnDrag.x) * canvasManager.scale;
         const dy = (canvasManager.currentmousePos.y - canvasManager.mousePositionOnDrag.y) * canvasManager.scale;
-        canvasManager.translateX += dx;
-        canvasManager.translateY += dy;
+        canvasManager.translateX += dx ;
+        canvasManager.translateY += dy ;
 
     } else {
         canvasManager.nodes.forEach(node => {
@@ -169,7 +169,7 @@ function handleMove(event, canvasManager) {
                 const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnDrag.x) * canvasManager.scale;
                 const dy = (canvasManager.currentmousePos.y - canvasManager.mousePositionOnDrag.y) * canvasManager.scale;
                 node.x += dx / canvasManager.scale; 
-                node.y += dy/ canvasManager.scale;
+                node.y += dy / canvasManager.scale;
                 if(!node.positionFixed){
                     node.intendedX = node.x;
                     node.intendedY = node.y; 
@@ -203,15 +203,25 @@ function isMouseOver(mouseX, mouseY, node, canvasManager) {
 }
 
 function handleWheel(event, canvasManager) {
-    // Check if the event is occurring inside the canvas or another specific area where you want to disable scrolling
     if (shouldPreventDefault(event, canvasManager)) {
         event.preventDefault();  // Prevent the page from scrolling
     }
-    
+
     const zoomIntensity = 0.1;
+    const mouseX = (event.clientX - canvasManager.canvas.getBoundingClientRect().left - canvasManager.translateX) / canvasManager.scale;
+    const mouseY = (event.clientY - canvasManager.canvas.getBoundingClientRect().top - canvasManager.translateY) / canvasManager.scale;
+
     const delta = event.deltaY > 0 ? -zoomIntensity : zoomIntensity;
     const newScale = canvasManager.scale + delta;
-    canvasManager.scale = Math.max(0.1, Math.min(newScale, 10)); // Constrain zoom level
+
+    // Constrain zoom level
+    const scale = Math.max(0.1, Math.min(newScale, 10));
+    
+    // Adjust translateX and translateY to keep the zoom centered around the mouse position
+    canvasManager.translateX -= mouseX * (scale - canvasManager.scale);
+    canvasManager.translateY -= mouseY * (scale - canvasManager.scale);
+    
+    canvasManager.scale = scale;
     canvasManager.draw();
 }
 

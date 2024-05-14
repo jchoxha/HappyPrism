@@ -79,6 +79,11 @@ canvas {
     cursor: pointer;
 }
 
+#node-size-range {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
 #toggle-node-position-fixed {
     pointer-events: auto;
     cursor: pointer;

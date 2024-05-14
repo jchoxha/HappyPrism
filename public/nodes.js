@@ -2,8 +2,6 @@
 import { ShapeType } from './shapes.js';
 import { CanvasManager } from './canvasManager.js';
 
-const radiusMult = 2; // Multiplier for node size to calculate radius
-
 class Node {
   constructor(startingX, startingY, size, shapeType, fill = "black", parent = null, children = []) {
     this.id = generateUUID();
@@ -11,7 +9,9 @@ class Node {
     this.y = this.intendedY = startingY;
     this.vx = this.vy = 0; // Velocity in X and Y
     this.size = size;
-    this.radius = size * radiusMult;
+    this.isResizing = false;
+    this.radiusMult = 2;
+    this.radius = this.size * this.radiusMult;
     this.angle = this.intendedAngle = this.refAngle = 0;
     this.dragging = this.inMovementAfterDragging = this.inOrbit = false;
     this.positionFixed = true;
@@ -67,14 +67,15 @@ function addNode(canvasManager, newNodeParent = null) {
     return;
   }
 
-  const defaultSize = 50;
-  const defaultShapeType = ShapeType.CIRCLE;
-  const defaultFill = "randomColor";
-  const startingPosition = canvasManager.mousePositionOnDown || { x: canvasManager.xCenter, y: canvasManager.yCenter };
+  let startingSize = 50;
+  let startingShapeType = ShapeType.CIRCLE;
+  let startingFill = "randomColor";
+  let startingPosition = canvasManager.mousePositionOnDown || { x: canvasManager.xCenter, y: canvasManager.yCenter };
   if(newNodeParent){
     startingPosition.y = newNodeParent.y - (newNodeParent.radius)
+    startingSize = newNodeParent.size * 0.5;
   }
-  const newNode = new Node(startingPosition.x, startingPosition.y, defaultSize, defaultShapeType, defaultFill, newNodeParent);
+  const newNode = new Node(startingPosition.x, startingPosition.y, startingSize, startingShapeType, startingFill, newNodeParent);
 
 
   console.log("Adding node:", newNode);

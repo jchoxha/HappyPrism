@@ -1,6 +1,7 @@
 // canvasManager.js
 import { Node} from './nodes.js';
 import { ShapeType } from './shapes.js';
+import { nearestMultiple } from './utils.js';
 
 class CanvasManager {
     constructor(canvasId) {
@@ -23,10 +24,12 @@ class CanvasManager {
         this.translateX = 0; // Added to track translation on X
         this.translateY = 0; // Added to track translation on Y
         this.scale = 1; 
-        this.topLeftX = 0;
-        this.topLeftY = 0;
-        this.bottomRightX = 0;
-        this.bottomRightY = 0;
+        this.topLeftX = -(this.width / this.scale);
+        this.topLeftY = (this.height / this.scale);
+        this.bottomRightX = (this.width / this.scale);
+        this.bottomRightY = -(this.height / this.scale);
+        this.visibleWidth = this.bottomRightX - this.topLeftX;
+        this.visibleHeight = this.bottomRightY -this.topLeftY;
 
         this.mousePositionOnDown = { x: 0, y: 0 };
         this.mousePositionOnUp = { x: 0, y: 0 };
@@ -69,26 +72,91 @@ class CanvasManager {
         this.ctx.save();
         this.ctx.translate(this.translateX, this.translateY); // Center the canvas
         this.ctx.scale(this.scale, this.scale); // Apply current scale
-        this.updateCanvasRange()
+    
+        // Draw the grid
+        if (this.topLeftY < 0 && this.bottomRightY > 0) {
+            this.drawXAxis(); 
+        }
+        if (this.topLeftX < 0 && this.bottomRightX > 0) {
+            this.drawYAxis(); 
+        }
+        let numNorthSouthLines = Math.floor(this.visibleWidth / 30);
+        let numEastWestLines = Math.floor(this.visibleHeight / 30);
+        let startPointX = nearestMultiple(this.topLeftX, 30);
+        let startPointY = nearestMultiple(this.topLeftY, 30);
+
+        for (let i = 0; i <= numNorthSouthLines; i++) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(startPointX + i * 30, this.topLeftY);
+            this.ctx.lineTo(startPointX + i * 30, this.bottomRightY);
+            this.ctx.stroke();
+        }
+        for (let i = 0; i <= numEastWestLines; i++) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.topLeftX, startPointY + i * 30);
+            this.ctx.lineTo(this.bottomRightX, startPointY + i * 30);
+            this.ctx.stroke();
+        }
+    
+        this.updateCanvasRange();
         this.nodes.forEach(node => this.drawNode(node));
         if (this.highlightedNode) {
-            if (this.toggleNodeDetails){
+            if (this.toggleNodeDetails) {
                 this.drawNodeDetails(this.highlightedNode);
+            } else {
+                this.drawNodeDetails();
             }
-            else{this.drawNodeDetails();}
-        }
-        else{
+        } else {
             this.drawNodeDetails();
         }
         this.ctx.restore();
-        this.drawCanvasDetails()
+        this.drawCanvasDetails();
     }
 
     updateCanvasRange() {
+        // const currentXCenter = (this.topLeftX - this.bottomRightX) / 2
+        // const currentYCenter = (this.topLeftY - this.bottomRightY) / 2
+        // this.topLeftX = currentXCenter - (this.width / this.scale);
+        // this.bottomRightX  = currentXCenter + (this.width / this.scale);
+        // this.topLeftY = currentYCenter - (this.height / this.scale);
+        // this.bottomRightY  = currentYCenter + (this.height / this.scale);
+
         this.topLeftX = -this.translateX / this.scale;
         this.topLeftY = -this.translateY / this.scale;;
         this.bottomRightX = this.topLeftX + (this.canvas.width / this.scale);
         this.bottomRightY = this.topLeftY + (this.canvas.height / this.scale);
+        this.visibleWidth = this.bottomRightX - this.topLeftX;
+        this.visibleHeight = this.bottomRightY -this.topLeftY;
+    }
+
+    drawXAxis() {
+        const { width, height, topLeftX, bottomRightX, ctx } = this;
+    
+        ctx.save();
+        ctx.strokeStyle = '#000000'; // Black color for the X-axis
+        ctx.lineWidth = 2;
+    
+        // X axis
+        ctx.beginPath();
+        ctx.moveTo(topLeftX, 0); // Start at the left edge of the canvas
+        ctx.lineTo(bottomRightX, 0); // Draw to the right edge of the canvas
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    drawYAxis() {
+        const { topLeftY, bottomRightY, ctx } = this;
+    
+        ctx.save();
+        ctx.strokeStyle = '#000000'; // Black color for the X-axis
+        ctx.lineWidth = 2;
+    
+        // X axis
+        ctx.beginPath();
+        ctx.moveTo(0, topLeftY); // Start at the left edge of the canvas
+        ctx.lineTo(0, bottomRightY); // Draw to the right edge of the canvas
+        ctx.stroke();
+        ctx.restore();
     }
 
     drawNode(node) {
@@ -151,6 +219,7 @@ class CanvasManager {
 
 
                 nodeDetailsContentStatic = `
+                    <input type="range" min="30" max="500" value="${node.size}" id="node-size-range"><br>
                     <button id="toggle-node-position-fixed">${node.positionFixed ? "Unfix Position" : "Fix Position"}</button><br>
                     Fill color: <input id ="node-color-picker" value="${node.fill}" data-jscolor="{preset:'small dark', position:'right'}" onclick="this.blur();"> `;
 
@@ -159,6 +228,17 @@ class CanvasManager {
 
 
                 //Add any event listeners to the static content 
+                const nodeSizeRange = document.getElementById('node-size-range');
+                nodeSizeRange.addEventListener('input', function() {
+                    console.log("Changing node size to: ", nodeSizeRange.value);
+                    node.isResizing = true;
+                    node.size = Number(nodeSizeRange.value);
+                    node.radius = node.size * node.radiusMult;
+                    this.nodeDetailsStaticContentInit = false;
+                });
+                nodeSizeRange.addEventListener('mouseout', function() {
+                    node.isResizing = false;
+                });
                 const positionToggleButton = document.getElementById('toggle-node-position-fixed');
                 positionToggleButton.onclick = () => {
                     node.positionFixed = !node.positionFixed;

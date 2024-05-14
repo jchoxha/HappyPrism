@@ -14,7 +14,9 @@ function physicsUpdate(canvasManager) {
 
     // Handle node movement and physics
     nodes.forEach(node => {
-        const collisionDetected = detectAndHandleCollisions(nodes, node);
+        let collisionDetected = false;
+        collisionDetected = detectAndHandleCollisions(nodes, node);
+
         if (!node.dragging) {
             if(node.inMovementAfterDragging){
                 // Apply velocity to position
@@ -54,12 +56,13 @@ function physicsUpdate(canvasManager) {
 function detectAndHandleCollisions(nodes, currentNode) {
     let collisionOccurred = false;
     nodes.forEach(node => {
-        if ( node!= currentNode && node.parent != currentNode && currentNode.parent != node){
+        if (node!= currentNode && node.parent != currentNode && currentNode.parent != node){
             if (node.parent && currentNode.parent && currentNode.parent == node.parent)
                 {
                    return collisionOccurred;
                 }
             if (checkCollision(currentNode, node)) {
+            console.log("Collision detected between: " + currentNode + " and " + node);
             handleCollision(currentNode, node);
                 collisionOccurred = true; 
             }
@@ -82,11 +85,11 @@ function handleCollision(node1, node2) {
     const displacementX = (overlap * (dx / distance));
     const displacementY = (overlap * (dy / distance));
 
-    if (!node1.dragging){
+    if (!node1.dragging && !node1.isResizing){
         node1.intendedX += displacementX;
         node1.intendedY += displacementY;
     }
-    if (!node2.dragging){
+    if (!node2.dragging&& !node2.isResizing){
         node2.intendedX -= displacementX;
         node2.intendedY -= displacementY;
     }
@@ -164,8 +167,11 @@ function pointInPolygon(point, polygon) {
 function circleCircleCollision(node1, node2) {
     const dx = node1.x - node2.x;
     const dy = node1.y - node2.y;
+    const totalSizeOfNodes = node1.size + node2.size;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    const totalRadius = (node1.size + node2.size) / 2;
+
+    const totalRadius = totalSizeOfNodes / 2;
+
     return distance < totalRadius;
 }
 
