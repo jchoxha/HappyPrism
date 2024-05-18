@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
    
     function update() {
+        canvasManager.currentTime = Date.now();
         physicsUpdate(canvasManager);
         canvasManager.draw();
     }

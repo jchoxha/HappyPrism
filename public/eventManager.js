@@ -1,3 +1,5 @@
+import { updateChildNodesRefAngles } from './nodes.js';
+
 // eventManager.js
 
 function setupEventListeners(canvasManager) {
@@ -98,6 +100,9 @@ function handleStart(event, canvasManager) {
             }
             else if (canvasManager.selectedNode != node) {
                 canvasManager.highlightedNode = node;
+                if (node.children.length > 0) {
+                    updateChildNodesRefAngles(node);
+                }
                 canvasManager.toggleNodeDetails = true;
                 canvasManager.nodeDetailsStaticContentInit = false;
                 console.log("Node highlighted: ", node);
@@ -106,10 +111,13 @@ function handleStart(event, canvasManager) {
                 
                 node.dragging = true;
                 canvasManager.highlightedNode = node;
+                if (node.children.length > 0) {
+                    updateChildNodesRefAngles(node);
+                }
                 canvasManager.toggleNodeDetails = true;
                 canvasManager.nodeDetailsStaticContentInit = false;
-                canvasManager.mousePositionOnDrag.x = canvasManager.currentmousePos.x;
-                canvasManager.mousePositionOnDrag.y = canvasManager.currentmousePos.y;
+                canvasManager.mousePositionOnMoveStart.x = canvasManager.currentmousePos.x;
+                canvasManager.mousePositionOnMoveStart.y = canvasManager.currentmousePos.y;
             }
             nodeFound = true;
             return;  // Stop searching once a node is found
@@ -121,8 +129,8 @@ function handleStart(event, canvasManager) {
     if (!nodeFound) {
         if (!canvasManager.draggingCanvas) {
             canvasManager.draggingCanvas = true;
-            canvasManager.mousePositionOnDrag.x = canvasManager.currentmousePos.x;
-            canvasManager.mousePositionOnDrag.y = canvasManager.currentmousePos.y;
+            canvasManager.mousePositionOnMoveStart.x = canvasManager.currentmousePos.x;
+            canvasManager.mousePositionOnMoveStart.y = canvasManager.currentmousePos.y;
             console.log("draggingCanvas: ", canvasManager.draggingCanvas);
         }
         
@@ -133,56 +141,66 @@ function handleStart(event, canvasManager) {
 }
 
 function handleEnd(event, canvasManager) {
-    canvasManager.mousePositionOnUp = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y }
-    console.log("Mouse up at: ", canvasManager.mousePositionOnUp);
+    canvasManager.mousePositionOnUp = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y };
     canvasManager.draggingCanvas = false;
 
-    // Reset dragging status for all nodes
+    const now = canvasManager.currentTime;
+
     canvasManager.nodes.forEach(node => {
         if (node.dragging) {
+            if (canvasManager.currentTime > canvasManager.mouseLastMoveTime) {
+                console.log("Node velocity canceled because " + (canvasManager.currentTime - canvasManager.mouseLastMoveTime) + " < 300");
+                node.vx = 0;
+                node.vy = 0;
+            }
             node.dragging = false;
-            
-            console.log("Node dragging ended for node:" + node);
-            // node.inMovementAfterDragging = true;
-            // console.log("Movement after dragging starting for: " + node)
-            // console.log("currentmouseV.x: " + canvasManager.currentmouseV.x);
-            node.vx = 0;
-            node.vy = 0;
-            
+            node.inMovementAfterDragging = true;
         }
     });
 }
 
+
+
 function handleMove(event, canvasManager) {
+
     const { clientX, clientY } = event;
     const { offsetX, offsetY } = getOffsets(clientX, clientY, canvasManager.canvas);
 
     if (canvasManager.draggingCanvas) {
-        const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnDrag.x) * canvasManager.scale;
-        const dy = (canvasManager.currentmousePos.y - canvasManager.mousePositionOnDrag.y) * canvasManager.scale;
-        canvasManager.translateX += dx ;
-        canvasManager.translateY += dy ;
-
+        const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnMoveStart.x) * canvasManager.scale;
+        const dy = (canvasManager.currentmousePos.y - canvasManager.mousePositionOnMoveStart.y) * canvasManager.scale;
+        canvasManager.translateX += dx;
+        canvasManager.translateY += dy;
     } else {
         canvasManager.nodes.forEach(node => {
             if (node.dragging) {
-                const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnDrag.x) * canvasManager.scale;
-                const dy = (canvasManager.currentmousePos.y - canvasManager.mousePositionOnDrag.y) * canvasManager.scale;
-                node.x += dx / canvasManager.scale; 
-                node.y += dy / canvasManager.scale;
-                if(!node.positionFixed){
+                const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnMoveLast.x);
+                const dy = (canvasManager.currentmousePos.y - canvasManager.mousePositionOnMoveLast.y);
+
+                const newX = node.x + dx;
+                const newY = node.y + dy;
+
+                node.vx = newX - node.x;
+                node.vy = newY - node.y;
+
+                node.x = newX;
+                node.y = newY;
+
+                if (!node.positionFixed) {
                     node.intendedX = node.x;
-                    node.intendedY = node.y; 
+                    node.intendedY = node.y;
                 }
-                // Update the base point for the next move
-                canvasManager.mousePositionOnDrag.x = canvasManager.currentmousePos.x;
-                canvasManager.mousePositionOnDrag.y = canvasManager.currentmousePos.y;
             }
         });
     }
     canvasManager.draw();
+    canvasManager.mousePositionOnMoveLast.x = canvasManager.currentmousePos.x;
+    canvasManager.mousePositionOnMoveLast.y = canvasManager.currentmousePos.y;
+    canvasManager.mouseLastMoveTime = canvasManager.currentTime;
     updateMouseProperties(event, canvasManager);
 }
+
+
 
 function updateMouseProperties(event, canvasManager) {
     const rect = canvasManager.canvas.getBoundingClientRect();

@@ -89,6 +89,10 @@ canvas {
     cursor: pointer;
 }
 
+#toggle-node-position-fixed:disabled {
+    color: #666;
+}
+
 #node-color-picker {
     pointer-events: auto;
     color: transparent;

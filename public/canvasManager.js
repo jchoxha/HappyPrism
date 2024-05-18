@@ -33,7 +33,8 @@ class CanvasManager {
 
         this.mousePositionOnDown = { x: 0, y: 0 };
         this.mousePositionOnUp = { x: 0, y: 0 };
-        this.mousePositionOnDrag = { x: 0, y: 0 };
+        this.mousePositionOnMoveStart = { x: 0, y: 0 };
+        this.mousePositionOnMoveLast = { x: 0, y: 0};
         this.currentmousePos = { x: 0, y: 0 };
         this.currentmouseV = { x: 0, y: 0 };
 
@@ -49,6 +50,9 @@ class CanvasManager {
         this.toggleCanvasDetails = false;
 
         this.theme = null;
+
+        //Time
+        this.currentTime = Date.now();
     }
 
     initCanvas(theme) {
@@ -201,9 +205,10 @@ class CanvasManager {
             //Set and print the dynamic values
             toggleNodeDetails = "-";
             nodeDetailsContentDynamic = `
-                ID: ${node.id}<br>
-                X: ${Math.round(node.x)}<br>
-                Y: ${Math.round(node.y)}<br>
+                <u>${node.name}</u><br>
+                Position: ${Math.round(node.x)}, ${Math.round(node.y)}<br>
+                X Velocity: ${node.vx.toFixed(2)}<br>
+                Y Velocity: ${node.vy.toFixed(2)}<br>
                 Size: ${node.size}<br>
                 Shape: ${node.shapeType.name}<br>
                 
@@ -218,10 +223,14 @@ class CanvasManager {
                 //Set value for color picker, should equal nodes current color.
 
 
-                nodeDetailsContentStatic = `
-                    <input type="range" min="30" max="500" value="${node.size}" id="node-size-range"><br>
-                    <button id="toggle-node-position-fixed">${node.positionFixed ? "Unfix Position" : "Fix Position"}</button><br>
-                    Fill color: <input id ="node-color-picker" value="${node.fill}" data-jscolor="{preset:'small dark', position:'right'}" onclick="this.blur();"> `;
+                nodeDetailsContentStatic = `<input type="range" min="30" max="500" value="${node.size}" id="node-size-range"><br>`;
+                if (!node.inOrbit) {
+                    nodeDetailsContentStatic += `<button id="toggle-node-position-fixed">${node.positionFixed ? "Unfix Position" : "Fix Position"}</button><br>`;
+                }
+                else {
+                    nodeDetailsContentStatic += `<button id="toggle-node-position-fixed" disabled> Position Fixed While in Orbit </button><br>`;
+                }
+                    nodeDetailsContentStatic += `Fill color: <input id ="node-color-picker" value="${node.fill}" data-jscolor="{preset:'small dark', position:'right'}" onclick="this.blur();"> `;
 
                 document.getElementById('node-details-content-static').innerHTML = nodeDetailsContentStatic;
 
@@ -241,9 +250,15 @@ class CanvasManager {
                 });
                 const positionToggleButton = document.getElementById('toggle-node-position-fixed');
                 positionToggleButton.onclick = () => {
-                    node.positionFixed = !node.positionFixed;
-                    positionToggleButton.textContent = node.positionFixed ? "Unfix Position" : "Fix Position";
-                    this.nodeDetailsStaticContentInit = false;
+                    if (!node.inOrbit) {
+                        node.positionFixed = !node.positionFixed;
+                        if (node.positionFixed) {
+                            node.fixedX = node.x;
+                            node.fixedY = node.y;
+                        }
+                        positionToggleButton.textContent = node.positionFixed ? "Unfix Position" : "Fix Position";
+                        this.nodeDetailsStaticContentInit = false;
+                    }
                 };
 
                 const nodeColorPicker = document.getElementById('node-color-picker');
@@ -290,8 +305,8 @@ class CanvasManager {
                 X: ${this.mousePositionOnUp.x.toFixed(0)}<br>
                 Y: ${this.mousePositionOnUp.y.toFixed(0)}<br>
                 <br>Mouse Drag Coords:<br>
-                X: ${this.mousePositionOnDrag.x.toFixed(0)}<br>
-                Y: ${this.mousePositionOnDrag.y.toFixed(0)}<br>
+                X: ${this.mousePositionOnMoveStart.x.toFixed(0)}<br>
+                Y: ${this.mousePositionOnMoveStart.y.toFixed(0)}<br>
 
                 <br>View Range:<br>
                 X: ${Math.round(this.topLeftX.toFixed(0))} to ${Math.round(this.bottomRightX.toFixed(2))}<br>

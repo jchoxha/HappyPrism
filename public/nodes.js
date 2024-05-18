@@ -2,27 +2,63 @@
 import { ShapeType } from './shapes.js';
 import { CanvasManager } from './canvasManager.js';
 
+//GLOBAL VARIABLES
+const radiusMult = 2;
+
+class Orbit {
+  constructor(centralNode = null, orbitingNodes = null, radius = 0, angularVelocity = 0) {
+    this.centralNode = centralNode;
+    this.orbitingNodes = orbitingNodes;
+    this.radius = radius;
+    this.angularVelocity = angularVelocity;
+  }
+
+}
+
 class Node {
-  constructor(startingX, startingY, size, shapeType, fill = "black", parent = null, children = []) {
+  constructor(startingX, startingY, size, shapeType, fill = "randomColor", parent = null, children = [], startingOrbit = null) {
+    this.name = "New Node";
     this.id = generateUUID();
-    this.x = this.intendedX = startingX;
-    this.y = this.intendedY = startingY;
-    this.vx = this.vy = 0; // Velocity in X and Y
+
+    //Positioning
+    this.x = this.intendedX = this.fixedX = startingX;
+    this.y = this.intendedY = this.fixedY = startingY;
+
+    //Node Sizing
     this.size = size;
     this.isResizing = false;
-    this.radiusMult = 2;
-    this.radius = this.size * this.radiusMult;
-    this.angle = this.intendedAngle = this.refAngle = 0;
-    this.dragging = this.inMovementAfterDragging = this.inOrbit = false;
+
+    //Physics
+    this.mass = size;
+    this.vx = this.vy = 0; // Velocity in X and 
     this.positionFixed = true;
     this.positionOnDragStart = { x: 0, y: 0 };
     this.dragOffsetX = this.dragOffsetY = 0;
+    this.angle = this.intendedAngle = this.refAngle = 0;
+
+    //Orbits
+    this.centralNode = null;
+    this.startingOrbit = null;
+    this.inOrbit = false;
+    if (startingOrbit) {
+      this.inOrbit = true;
+      this.positionFixed = false;
+      this.currentOrbit = startingOrbit;
+  }
+    this.orbits = [];
+    
+
+    //Handle dragging
+    this.dragging = this.inMovementAfterDragging = this.inMovementAfterCollision = false;
+
+    //Node Parent and Children
     this.parent = parent;
     this.children = children;
-    this.shapeType = shapeType;
 
+    //Node Visuals
+    this.shapeType = shapeType;
+    this.fill = fill;
     this.setFillStyle(fill);
-    this.addSelfToParent();
   }
 
   setFillStyle(fill) {
@@ -43,6 +79,22 @@ class Node {
     } else if (this.parent) {
       console.error('Invalid parent node provided');
     }
+  }
+  
+  addSelfToOrbit(centralNode, orbit) {
+    if (orbit && orbit instanceof Orbit && Array.isArray(orbit.orbitingNodes)) {
+      orbit.orbitingNodes.push(this);
+      this.currentOrbit = orbit;
+      this.centralNode = centralNode;
+    } else if (orbit) {
+      console.error('Invalid orbit provided');
+    }
+  }
+  addOrbit() {
+
+    let orbit = new Orbit(this, [], this.size * radiusMult * (this.orbits.length + 1), 0.01);
+    this.orbits.push(orbit);
+    return orbit;
   }
 }
 
@@ -71,22 +123,49 @@ function addNode(canvasManager, newNodeParent = null) {
   let startingShapeType = ShapeType.CIRCLE;
   let startingFill = "randomColor";
   let startingPosition = canvasManager.mousePositionOnDown || { x: canvasManager.xCenter, y: canvasManager.yCenter };
+  let startingOrbit = null;
   if(newNodeParent){
-    startingPosition.y = newNodeParent.y - (newNodeParent.radius)
     startingSize = newNodeParent.size * 0.5;
-  }
-  const newNode = new Node(startingPosition.x, startingPosition.y, startingSize, startingShapeType, startingFill, newNodeParent);
 
+    //Add to 1st orbit of parent by default
+    if (!newNodeParent.orbits || !Array.isArray(newNodeParent.orbits)) {
+      newNodeParent.orbits = [];
+    }
+
+    if (newNodeParent.orbits.length === 0) {
+      newNodeParent.addOrbit();
+    }
+    startingPosition.y = newNodeParent.y - (newNodeParent.orbits[0].radius)
+    startingOrbit = true;
+  }
+  const newNode = new Node(startingPosition.x, startingPosition.y, startingSize, startingShapeType, startingFill, newNodeParent, [], startingOrbit);
+  
+      newNode.positionFixed = false;
+
+  if (newNodeParent) {
+    if (newNode.inOrbit) {
+      //Add to parent's first orbit by default
+      newNode.addSelfToOrbit(newNodeParent, newNodeParent.orbits[0]);
+    }
+    newNode.addSelfToParent();
+    updateChildNodesRefAngles(newNodeParent);
+  }
 
   console.log("Adding node:", newNode);
   canvasManager.nodes.push(newNode);
   if(!canvasManager.toggleNodeDetails) {
     canvasManager.toggleNodeDetails = !canvasManager.toggleNodeDetails;
   }
-  if (canvasManager.nodes.length == 1) {
-    canvasManager.highlightedNode = canvasManager.nodes[0];
-  }
   return newNode;
+}
+
+function updateChildNodesRefAngles(parentNode) {
+  const children = parentNode.children;
+  const angleStep = (2 * Math.PI) / children.length;
+
+  children.forEach((child, index) => {
+    child.refAngle = index * angleStep;
+  });
 }
 
 function removeNode(nodes, nodeToRemove) {
@@ -134,4 +213,4 @@ function removeOnlyParent(nodes, nodeToRemove) {
 }
 
 
-export { Node, addNode, removeNode, removeOnlyParent };
+export { Node, addNode, removeNode, removeOnlyParent, updateChildNodesRefAngles };
