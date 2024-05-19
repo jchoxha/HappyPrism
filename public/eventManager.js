@@ -100,24 +100,35 @@ function handleStart(event, canvasManager) {
             }
             else if (canvasManager.selectedNode != node) {
                 canvasManager.highlightedNode = node;
-                if (node.children.length > 0) {
-                    updateChildNodesRefAngles(node);
-                }
                 canvasManager.toggleNodeDetails = true;
                 canvasManager.nodeDetailsStaticContentInit = false;
                 console.log("Node highlighted: ", node);
+                if (canvasManager.changeCentralNodeMode) {
+                    canvasManager.changeCentralNode(canvasManager.nodeToChangeCentralNode, node);
+                    updateChildNodesRefAngles(node);
+                    canvasManager.changeCentralNodeMode = false;
+                    canvasManager.nodeToChangeCentralNode = null;
+                }
+                if (node.orbits.length > 0) {
+                    updateChildNodesRefAngles(node);
+                }
             }
             if (canvasManager.selectedNode == node || canvasManager.selectedNode == node.parent && node.parent != null){
                 
                 node.dragging = true;
                 canvasManager.highlightedNode = node;
-                if (node.children.length > 0) {
-                    updateChildNodesRefAngles(node);
-                }
                 canvasManager.toggleNodeDetails = true;
                 canvasManager.nodeDetailsStaticContentInit = false;
                 canvasManager.mousePositionOnMoveStart.x = canvasManager.currentmousePos.x;
                 canvasManager.mousePositionOnMoveStart.y = canvasManager.currentmousePos.y;
+                if (canvasManager.changeCentralNodeMode) {
+                    canvasManager.changeCentralNode(canvasManager.nodeToChangeCentralNode, node);
+                    canvasManager.changeCentralNodeMode = false;
+                    canvasManager.nodeToChangeCentralNode = null;
+                }
+                if (node.orbits.length > 0) {
+                    updateChildNodesRefAngles(node);
+                }
             }
             nodeFound = true;
             return;  // Stop searching once a node is found

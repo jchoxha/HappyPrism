@@ -11,6 +11,7 @@ class Orbit {
     this.orbitingNodes = orbitingNodes;
     this.radius = radius;
     this.angularVelocity = angularVelocity;
+    this.radiusMult = radiusMult;
   }
 
 }
@@ -81,7 +82,8 @@ class Node {
     }
   }
   
-  addSelfToOrbit(centralNode, orbit) {
+  addSelfToOrbit(canvasManager, centralNode, orbit) {
+    canvasManager.nodeDetailsStaticContentInit = false;
     if (orbit && orbit instanceof Orbit && Array.isArray(orbit.orbitingNodes)) {
       orbit.orbitingNodes.push(this);
       this.currentOrbit = orbit;
@@ -90,8 +92,8 @@ class Node {
       console.error('Invalid orbit provided');
     }
   }
-  addOrbit() {
-
+  addOrbit(canvasManager) {
+    canvasManager.nodeDetailsStaticContentInit = false;
     let orbit = new Orbit(this, [], this.size * radiusMult * (this.orbits.length + 1), 0.01);
     this.orbits.push(orbit);
     return orbit;
@@ -114,6 +116,7 @@ function isValidColor(strColor) {
 }
 
 function addNode(canvasManager, newNodeParent = null) {
+  canvasManager.nodeDetailsStaticContentInit = false;
   if (!canvasManager.width || !canvasManager.height) {
     console.error('Canvas dimensions are not set!');
     return;
@@ -133,7 +136,7 @@ function addNode(canvasManager, newNodeParent = null) {
     }
 
     if (newNodeParent.orbits.length === 0) {
-      newNodeParent.addOrbit();
+      newNodeParent.addOrbit(canvasManager);
     }
     startingPosition.y = newNodeParent.y - (newNodeParent.orbits[0].radius)
     startingOrbit = true;
@@ -145,7 +148,7 @@ function addNode(canvasManager, newNodeParent = null) {
   if (newNodeParent) {
     if (newNode.inOrbit) {
       //Add to parent's first orbit by default
-      newNode.addSelfToOrbit(newNodeParent, newNodeParent.orbits[0]);
+      newNode.addSelfToOrbit(canvasManager, newNodeParent, newNodeParent.orbits[0]);
     }
     newNode.addSelfToParent();
     updateChildNodesRefAngles(newNodeParent);

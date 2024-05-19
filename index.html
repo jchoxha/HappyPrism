@@ -18,14 +18,17 @@
 </head>
 <body>
     <canvas id="canvas"></canvas>
-    <div id="confirmation-modal" style="display:none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+    <div id="confirm-remove-node-modal" class="confirmation-modal" style="display:none;">
       <div style="background: white; width: 300px; margin: 100px auto; padding: 20px; text-align: center;">
           <p>Do you want to remove this node?</p>
           <button id="remove-with-children">Remove this node and all its children</button>
           <button id="remove-only-this">Remove only this node</button>
           <button id="cancel-remove">Cancel</button>
       </div>
-  </div>
+    </div>
+    
+    <div id="change-central-node-modal" class="confirmation-modal" style="display:none;">
+    </div>
     <div id="control-buttons">
       <button class="node-add-sub-buttons" id="add-node">+</button>
       <button class="node-add-sub-buttons" id="remove-node">-</button>
@@ -36,12 +39,11 @@
         <div id="node-details-content-dynamic"></div>
         <div id="node-details-content-static"></div>
       </div>
-  </div>
-  <div id="canvas-details">
+    </div>
+    <div id="orbit-details-menu"></div>
+    <div id="canvas-details">
       <div id="canvas-details-content"></div>
       <button id="toggle-canvas-details">+</button>
-  </div>
-
-    
+    </div>
 </body>
 </html>

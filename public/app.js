@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     removeButton.addEventListener('click', () => {
-        const modal = document.getElementById('confirmation-modal');
-        if (canvasManager.highlightedNode) {
+        const modal = document.getElementById('confirm-remove-node-modal');
+        if (canvasManager.highlightedNode && modal) {
             modal.style.display = 'block'; // Show the modal
             if (canvasManager.highlightedNode.children.length > 0) {
                 document.getElementById('remove-with-children').style.display = 'block';
