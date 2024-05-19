@@ -1,112 +1,7 @@
-// --Physics.js-- //
-
-
-//~~~~Global Properties~~~~//
-const MAX_VELOCITY = 650;  // Maximum pixels per second
-const angularVelocity = 0.01;
-const deceleration = 0.95;
-const gravityStrength = 0.005;
-const center = { x: canvas.width / 2, y: canvas.height / 2 };
-let angle = 0;
-
-//~~~~Physics Functions~~~~//
-function physicsUpdate(canvasManager) {
-    const nodes = canvasManager.nodes;
-
-    nodes.forEach(node => {
-        if (Math.abs(node.vx) > Math.abs(node.vxMax)) {
-            node.vxMax = node.vx;
-        }
-        if (Math.abs(node.vy) > Math.abs(node.vyMax)) {
-            node.vyMax = node.vy;
-        }
-
-        let collisionDetected = false;
-        collisionDetected = detectAndHandleCollisions(nodes, node);
-
-        // If this node is being dragged, or if this node has a central node and that node is being dragged, do not further simulate physics
-        if (!node.dragging && (!node.centralNode || (node.centralNode && !node.centralNode.dragging))) {
-            if ((node.inMovementAfterDragging || node.inMovementAfterCollision) && !node.inOrbit) {
-                // Apply velocity to position
-                node.x += node.vx;
-                node.y += node.vy;
-
-                // Apply gravitational force if the position is fixed
-                if (node.positionFixed) {
-                    applyGravitationalForce(node);
-                }
-
-                // Apply deceleration to velocity
-                node.vx *= deceleration;
-                node.vy *= deceleration;
-
-                // Stop the node if velocity is very low
-                if (Math.abs(node.vx) < 0.001 && Math.abs(node.vy) < 0.001) {
-                    if (node.positionFixed) {
-                        node.x = node.fixedX;
-                        node.y = node.fixedY;
-                    } else {
-                        node.intendedX = node.x;
-                        node.intendedY = node.y;
-                    }
-                    node.vx = 0;
-                    node.vy = 0;
-                    node.inMovementAfterDragging = false;
-                    node.inMovementAfterCollision = false;
-                    console.log("Movement after dragging complete for: " + node);
-                }
-                return;
-            } else if (node.inOrbit) {
-                if (canvasManager.highlightedNode !== node.centralNode) {
-                    node.refAngle += node.currentOrbit.angularVelocity;
-                    node.refAngle %= 2 * Math.PI;
-                }
-                const centerX = node.centralNode.x;
-                const centerY = node.centralNode.y;
-                node.intendedX = centerX + node.currentOrbit.radius * Math.cos(node.refAngle);
-                node.intendedY = centerY + node.currentOrbit.radius * Math.sin(node.refAngle);
-            }
-
-            node.x = lerp(node.x, node.intendedX, 0.2);  // Increase the lerp factor for faster response
-            node.y = lerp(node.y, node.intendedY, 0.2);  // Increase the lerp factor for faster response
-        }
-        if (node.centralNode && node.centralNode.dragging){
-            const centerX = node.centralNode.x;
-            const centerY = node.centralNode.y;
-            node.intendedX = centerX + node.currentOrbit.radius * Math.cos(node.refAngle);
-            node.intendedY = centerY + node.currentOrbit.radius * Math.sin(node.refAngle);
-            node.x = lerp(node.x, node.intendedX, 0.2);  // Increase the lerp factor for faster response
-            node.y = lerp(node.y, node.intendedY, 0.2);  // Increase the lerp factor for faster response
-        }
-    });
-}
-
-
-
-
-
-function applyGravitationalForce(node) {
-    const distanceX = node.fixedX - node.x;
-    const distanceY = node.fixedY - node.y;
-
-    // Calculate the force based on distance
-    const forceX = distanceX * gravityStrength;
-    const forceY = distanceY * gravityStrength;
-
-    // Apply the force to the node's velocity
-    node.vx += forceX;
-    node.vy += forceY;
-}
-
-
 function detectAndHandleCollisions(nodes, currentNode) {
     let collisionOccurred = false;
     nodes.forEach(node => {
-        if (node!= currentNode && node.centralNode != currentNode && currentNode.centralNode != node){
-            if (node.centralNode && currentNode.centralNode && currentNode.centralNode == node.centralNode)
-                {
-                   return;
-                }
+        if (node!= currentNode){
             if (checkCollision(currentNode, node)) {
             console.log("Collision detected between: " + currentNode + " and " + node);
             handleCollision(currentNode, node);
@@ -129,8 +24,8 @@ function handleCollision(node1, node2) {
     const displacementY = (overlap * (dy / distance)) / 2;
 
     // Calculate mass based on node size
-    const mass1 = node1.mass;
-    const mass2 = node2.mass;
+    const mass1 = node1.size;
+    const mass2 = node2.size;
     const totalMass = mass1 + mass2;
 
     // Calculate new velocities based on momentum conservation for elastic collision
@@ -154,19 +49,6 @@ function handleCollision(node1, node2) {
         node2.x -= displacementX;
         node2.y -= displacementY;
     }
-}
-
-
-
-function isAncestorSelected(node, canvasManager) {
-    let currentNode = node.parent;  // Start checking from the parent of the given node.
-    while (currentNode !== null) {
-        if (currentNode === canvasManager.selectedNode) {
-            return true;  // An ancestor is the selected node.
-        }
-        currentNode = currentNode.parent;  // Move to the next parent in the hierarchy.
-    }
-    return false;  // No ancestors were the selected node.
 }
 
 //~~~~Collision Functions~~~~//
@@ -340,8 +222,4 @@ function pointToSegmentDistance(px, py, ax, ay, bx, by) {
     return Math.sqrt(dx * dx + dy * dy);
 }
 
-//~~~~Movement~~~~//
-function lerp(start, end, amt) {
-    return (1 - amt) * start + amt * end;
-}
-export { physicsUpdate };
+export { detectAndHandleCollisions};

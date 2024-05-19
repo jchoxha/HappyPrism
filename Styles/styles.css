@@ -41,7 +41,7 @@ canvas {
     border: 1px solid #ccc;
 }
 
-.confirmation-modal {
+#confirmation-modal {
     display: none;
     position: fixed;
     left: 0;
@@ -52,7 +52,7 @@ canvas {
     z-index: 1000;
 }
 
-.confirmation-modal div {
+#confirmation-modal-content {
     background: white;
     width: 300px;
     margin: 100px auto;
@@ -75,11 +75,6 @@ canvas {
 }
 
 #toggle-node-details {
-    pointer-events: auto;
-    cursor: pointer;
-}
-
-#modify-orbits {
     pointer-events: auto;
     cursor: pointer;
 }
@@ -110,21 +105,6 @@ canvas {
 }
 #node-color-picker:focus {
     outline: none; /* Removes focus outline if still visible */
-}
-
-#orbit-details-menu {
-    left: 150px; 
-    top: 10px;
-    position: fixed;
-    color: white;
-    z-index: 10;
-    background: rgba(0, 0, 0, 0.5);
-    pointer-events: none;
-}
-
-.orbit-menu-buttons {
-    pointer-events: auto;
-    cursor: pointer;
 }
 
 #toggle-canvas-details {

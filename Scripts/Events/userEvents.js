@@ -1,12 +1,8 @@
-import { updateChildNodesRefAngles } from './nodes.js';
-
-// eventManager.js
-
-function setupEventListeners(canvasManager) {
-    const events = ['mousedown', 'mouseup', 'mousemove', 'wheel'];
+function setUpUserEvents(canvasManager){
+    const mouseEvents = ['mousedown', 'mouseup', 'mousemove', 'wheel'];
     const touchEvents = ['touchstart', 'touchend', 'touchmove', 'touchcancel'];
 
-    events.forEach(event => {
+    mouseEvents.forEach(event => {
         canvasManager.canvas.addEventListener(event, (event) => {
             handleEvent(event, canvasManager);
         }, { passive: false });
@@ -17,6 +13,7 @@ function setupEventListeners(canvasManager) {
             handleTouchEvent(event, canvasManager);
         }, { passive: false });
     });
+
 }
 
 let initialPinchDistance = null;
@@ -92,28 +89,16 @@ function handleStart(event, canvasManager) {
         const node = canvasManager.nodes[i];
         if (isMouseOver(offsetX, offsetY, node, canvasManager)) {
             if (canvasManager.highlightedNode == node && canvasManager.selectedNode != node) {
-                if((node.parent && canvasManager.selectedNode != node.parent) 
-                || (!node.parent)){ 
-                    canvasManager.selectedNode = node;
-                    console.log("Node selected: ", node)
-                    }
+                canvasManager.selectedNode = node;
+                console.log("Node selected: ", node)
             }
             else if (canvasManager.selectedNode != node) {
                 canvasManager.highlightedNode = node;
                 canvasManager.toggleNodeDetails = true;
                 canvasManager.nodeDetailsStaticContentInit = false;
                 console.log("Node highlighted: ", node);
-                if (canvasManager.changeCentralNodeMode) {
-                    canvasManager.changeCentralNode(canvasManager.nodeToChangeCentralNode, node);
-                    updateChildNodesRefAngles(node);
-                    canvasManager.changeCentralNodeMode = false;
-                    canvasManager.nodeToChangeCentralNode = null;
-                }
-                if (node.orbits.length > 0) {
-                    updateChildNodesRefAngles(node);
-                }
             }
-            if (canvasManager.selectedNode == node || canvasManager.selectedNode == node.parent && node.parent != null){
+            if (canvasManager.selectedNode == node){
                 
                 node.dragging = true;
                 canvasManager.highlightedNode = node;
@@ -121,14 +106,6 @@ function handleStart(event, canvasManager) {
                 canvasManager.nodeDetailsStaticContentInit = false;
                 canvasManager.mousePositionOnMoveStart.x = canvasManager.currentmousePos.x;
                 canvasManager.mousePositionOnMoveStart.y = canvasManager.currentmousePos.y;
-                if (canvasManager.changeCentralNodeMode) {
-                    canvasManager.changeCentralNode(canvasManager.nodeToChangeCentralNode, node);
-                    canvasManager.changeCentralNodeMode = false;
-                    canvasManager.nodeToChangeCentralNode = null;
-                }
-                if (node.orbits.length > 0) {
-                    updateChildNodesRefAngles(node);
-                }
             }
             nodeFound = true;
             return;  // Stop searching once a node is found
@@ -271,4 +248,4 @@ function getOffsets(clientX, clientY, canvas) {
     };
 }
 
-export { setupEventListeners };
+export { setUpUserEvents };

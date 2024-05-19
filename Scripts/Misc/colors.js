@@ -157,7 +157,7 @@ const ColorCategories = {
 
 function getRandomColor() {
   const [red, green, blue] = Array.from({ length: 3 }, () => Math.floor(Math.random() * 256));
-  return `rgb(${red},${green},${blue})`;
+  return `rgba(${red},${green},${blue},1)`;
 }
 
 
@@ -203,14 +203,10 @@ function colorToRGB(colorName) {
 }
 
 // Check if the color string is valid
-function isValidColor(color) {
-  const hexPattern = /^#(?:[0-9a-fA-F]{3}){1,2}$/i;
-  const rgbPattern = /^rgb\(\d{1,3},\d{1,3},\d{1,3}\)$/;
-  // Updated RGBA pattern to correctly handle RGBA values
-  const rgbaPattern = /^rgba\(\d{1,3},\d{1,3},\d{1,3},(0|1|0?\.\d+)\)$/;
-
-  return hexPattern.test(color) || rgbPattern.test(color) || rgbaPattern.test(color) || 
-         !!findColor(c => c.hex === color || c.rgb === color);
+function isValidColorString(strColor) {
+  const style = new Option().style;
+  style.color = strColor;
+  return style.color === strColor.toLowerCase();
 }
 
 // Check if the RGB values are within range
@@ -220,4 +216,4 @@ function isValidRGB(color) {
 }
 
 // Export all functions
-export { colorToHex, hexToColor, rgbToColor, colorToRGB, isValidColor, isValidRGB, getRandomColor };
+export { colorToHex, hexToColor, rgbToColor, colorToRGB, isValidColorString, isValidRGB, getRandomColor };
