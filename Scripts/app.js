@@ -1,21 +1,25 @@
-import { addNode, removeNode } from './Classes/nodeClass.js';
-import { CanvasManager } from './Classes/canvasManagerClass.js';
+import { CanvasManager } from './Classes/Canvas/canvasManagerClass.js';
 import { setupEventListeners } from './Events/eventManager.js'
 import { physicsUpdate } from './Physics/physics.js'
 import { Theme } from './Misc/theme.js'
+import { loadUI, updateUI } from './UI/ui.js'
 
 
 document.addEventListener('DOMContentLoaded', () => {
+    loadUI("default");
+
     const theme = new Theme();
     theme.initTheme();
+
     const canvasManager = new CanvasManager('canvas');
     canvasManager.initCanvas(theme);
+
     setupEventListeners(canvasManager);
 
     function update() {
-        canvasManager.currentTime = Date.now();
+        canvasManager.update();
         physicsUpdate(canvasManager);
-        canvasManager.draw();
+        updateUI(canvasManager);
     }
     function animate() {
         update();

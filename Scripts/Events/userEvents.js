@@ -34,7 +34,6 @@ function handleTouchEvent(event, canvasManager) {
                 const scaleRatio = distance / initialPinchDistance;
                 const newScale = lastScale * scaleRatio;
                 canvasManager.scale = Math.max(0.1, Math.min(newScale, 10)); // Adjust limits as necessary
-                canvasManager.draw();
             }
         } else if (event.type === 'touchstart') {
             initialPinchDistance = distance;
@@ -151,9 +150,6 @@ function handleEnd(event, canvasManager) {
 
 function handleMove(event, canvasManager) {
 
-    const { clientX, clientY } = event;
-    const { offsetX, offsetY } = getOffsets(clientX, clientY, canvasManager.canvas);
-
     if (canvasManager.draggingCanvas) {
         const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnMoveStart.x) * canvasManager.scale;
         const dy = (canvasManager.currentmousePos.y - canvasManager.mousePositionOnMoveStart.y) * canvasManager.scale;
@@ -181,7 +177,6 @@ function handleMove(event, canvasManager) {
             }
         });
     }
-    canvasManager.draw();
     canvasManager.mousePositionOnMoveLast.x = canvasManager.currentmousePos.x;
     canvasManager.mousePositionOnMoveLast.y = canvasManager.currentmousePos.y;
     canvasManager.mouseLastMoveTime = canvasManager.currentTime;
@@ -228,7 +223,6 @@ function handleWheel(event, canvasManager) {
     canvasManager.translateY -= mouseY * (scale - canvasManager.scale);
     
     canvasManager.scale = scale;
-    canvasManager.draw();
 }
 
 // This function decides when to call preventDefault based on your specific logic
