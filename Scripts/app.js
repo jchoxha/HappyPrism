@@ -3,9 +3,13 @@ import { setupEventListeners } from './Events/eventManager.js'
 import { physicsUpdate } from './Physics/physics.js'
 import { Theme } from './Misc/theme.js'
 import { loadUI, updateUI } from './UI/ui.js'
+import { Logger } from './Debug/logger.js'
 
 
 document.addEventListener('DOMContentLoaded', () => {
+    const debugMode = false; // Set to false to turn off logging
+    Logger.setDebugMode(debugMode);
+
     loadUI("default");
 
     const theme = new Theme();
@@ -18,7 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function update() {
         canvasManager.update();
-        physicsUpdate(canvasManager);
+        if (canvasManager.physicsEnabled) {
+            physicsUpdate(canvasManager);
+        }
         updateUI(canvasManager);
     }
     function animate() {

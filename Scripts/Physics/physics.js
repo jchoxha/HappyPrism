@@ -1,4 +1,5 @@
 // --Physics.js-- //
+import { Logger } from '../Debug/logger.js';
 import { detectAndHandleCollisions } from './collision.js';
 
 //~~~~Global Properties~~~~//
@@ -41,7 +42,7 @@ function physicsUpdate(canvasManager) {
                     node.vy = 0;
                     node.inMovementAfterDragging = false;
                     node.inMovementAfterCollision = false;
-                    console.log("Movement after dragging complete for: " + node);
+                    Logger.log("Movement after dragging complete for: " + node);
                 }
                 return;
             }

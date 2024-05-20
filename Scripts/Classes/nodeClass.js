@@ -1,4 +1,5 @@
 // nodes.js
+import { Logger } from '../Debug/logger.js';
 import { ShapeType } from '../Misc/shapes.js';
 import { getRandomColor, isValidColorString } from '../Misc/colors.js';
 import { generateUUID } from '../Misc/utils.js';
@@ -38,7 +39,7 @@ class Node {
     } else if (isValidColorString(fill)) {
       this.fill = fill;
     } else {
-      console.error(`Invalid color: ${fill}, using black instead`);
+      Logger.error(`Invalid color: ${fill}, using black instead`);
       this.fill = 'black';
     }
     this.fillStyle = "solidColor";
@@ -49,12 +50,12 @@ class Node {
 function addNode(canvasManager) {
  
   let startingPosition = canvasManager.mousePositionOnDown;
-  console.log("Starting position:", startingPosition)
+  Logger.log("Starting position:", startingPosition)
 
   const newNode = new Node(startingPosition.x, startingPosition.y);
   newNode.positionFixed = false;
 
-  console.log("Adding node:", newNode);
+  Logger.log("Adding node:", newNode);
   canvasManager.nodes.push(newNode);
   if(!canvasManager.toggleNodeDetails) {
     canvasManager.toggleNodeDetails = !canvasManager.toggleNodeDetails;

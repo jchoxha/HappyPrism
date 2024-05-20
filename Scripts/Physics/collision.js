@@ -1,9 +1,11 @@
+import { Logger } from "../Debug/logger.js";
+
 function detectAndHandleCollisions(nodes, currentNode) {
     let collisionOccurred = false;
     nodes.forEach(node => {
         if (node!= currentNode){
             if (checkCollision(currentNode, node)) {
-            console.log("Collision detected between: " + currentNode + " and " + node);
+            Logger.log("Collision detected between: " + currentNode + " and " + node);
             handleCollision(currentNode, node);
                 collisionOccurred = true; 
             }
@@ -13,6 +15,14 @@ function detectAndHandleCollisions(nodes, currentNode) {
 }
 
 function handleCollision(node1, node2) {
+
+    if (node1.x == node2.x && node1.y == node2.y) {
+        node1.x += node2.size / 2;
+        node1.y += node2.size / 2;
+        node2.x -= node1.size / 2;
+        node2.y -= node1.size / 2;
+        return;
+    }
     const dx = node1.x - node2.x;
     const dy = node1.y - node2.y;
     const distance = Math.sqrt(dx * dx + dy * dy);

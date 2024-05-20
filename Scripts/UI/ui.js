@@ -1,4 +1,6 @@
+import { Logger } from "../Debug/logger.js";
 import { updateCanvasUI } from "./canvasUI.js";
+
 
 function loadUI(uiVersion){
     switch
@@ -14,8 +16,14 @@ function updateUI (canvasManager){
 }
 
 function loadUIDefault(){
-    console.log("Loading default UI");
+    Logger.log("Loading default UI");
+     /*html*/
     let defaultHTML = `
+    <div id="top-bar">
+      <button id="back-button">&#8592; Back</button>
+      <div id="node-title">Node Title</div>
+      <button id="settings-button">Settings</button>
+    </div>
     <canvas id="canvas"></canvas>
     <div id="confirmation-modal" style="display:none;">
     </div>

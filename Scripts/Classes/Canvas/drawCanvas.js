@@ -1,3 +1,4 @@
+import { Logger } from '../../Debug/logger.js';
 import { nearestMultiple } from '../../Misc/utils.js';
 
 const gridInterval = 30;
@@ -55,8 +56,8 @@ function drawXAxis(canvasManager) {
 }
 
 function drawYAxis(canvasManager) {
-    const topLeftY = canvasManager.topLeftX;
-    const bottomRightY =canvasManager.bottomRightX;
+    const topLeftY = canvasManager.topLeftY;
+    const bottomRightY =canvasManager.bottomRightY;
     const ctx = canvasManager.ctx;
 
     ctx.save();
@@ -79,14 +80,14 @@ function drawNode(canvasManager, node) {
     } else if (node.shapeType.isPolygon) {
         drawPolygon(canvasManager, x, y, node.shapeType.numSides, radius);
     } else {
-        console.error('Cannot draw unknown shape type:', node.shapeType.name);
+        Logger.error('Cannot draw unknown shape type:', node.shapeType.name);
     }
     canvasManager.ctx.closePath();
     if (node.fillStyle === "solidColor") {
         canvasManager.ctx.fillStyle = node.fill;
         canvasManager.ctx.fill();
     } else {
-        console.error("No fill style found for node, using black instead");
+        Logger.error("No fill style found for node, using black instead");
         canvasManager.ctx.fillStyle = "black";
         canvasManager.ctx.stroke();
     }

@@ -6,14 +6,21 @@ class CanvasManager {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
 
+        this.physicsEnabled = false;
+
+        this.theme = null;
+        this.currentTime = Date.now();
+
         this.nodes = [];
         this.selectedNode = null;
         this.highlightedNode = null;
-        this.draggingCanvas = false;
+
         this.width = this.canvas.width;
         this.height = this.canvas.height;
         this.xCenter = 0;
         this.yCenter = 0;
+
+        this.draggingCanvas = false;
         this.translateX = 0;
         this.translateY = 0;
         this.scale = 1;
@@ -23,6 +30,7 @@ class CanvasManager {
         this.bottomRightY = -(this.height / this.scale);
         this.visibleWidth = this.bottomRightX - this.topLeftX;
         this.visibleHeight = this.bottomRightY - this.topLeftY;
+
         this.mousePositionOnDown = { x: 0, y: 0 };
         this.mousePositionOnUp = { x: 0, y: 0 };
         this.mousePositionOnMoveStart = { x: 0, y: 0 };
@@ -31,11 +39,15 @@ class CanvasManager {
         this.currentmouseV = { x: 0, y: 0 };
         this.mouseLastMoveTime = null;
         this.mouseLastMovePos = { x: null, y: null };
+
+        // CANVAS UI ELEMNENTS
+
+        // Node Details
         this.toggleNodeDetails = false;
         this.nodeDetailsStaticContentInit = false;
+
+        // Canvas Details
         this.toggleCanvasDetails = false;
-        this.theme = null;
-        this.currentTime = Date.now();
     }
 
     initCanvas(theme) {
@@ -52,10 +64,11 @@ class CanvasManager {
     }
 
     resizeCanvas() {
+        const rect = canvas.getBoundingClientRect();
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        this.translateX = this.canvas.width / 2;
-        this.translateY = this.canvas.height / 2;
+        this.translateX = (this.canvas.width - rect.left) / 2;
+        this.translateY = (this.canvas.height - rect.top) / 2;
     }
 
     updateCanvasRange() {

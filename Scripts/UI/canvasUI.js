@@ -1,3 +1,7 @@
+import { Logger } from "../Debug/logger.js";
+import { setUpNodeDetailsEvents } from "../Events/uiEvents.js";
+
+
 function updateCanvasUI(canvasManager){
     //Set canvas details content
     setContentCanvasDetails(canvasManager)
@@ -62,40 +66,16 @@ function setContentNodeDetails(canvasManager, node = null) {
         document.getElementById('node-details-content-dynamic').innerHTML = nodeDetailsContentDynamic;
 
         if (!canvasManager.nodeDetailsStaticContentInit) {
+            Logger.log("Initializing static node details content")
             canvasManager.nodeDetailsStaticContentInit = true;
-
-            nodeDetailsContentStatic = `<input type="range" min="30" max="500" value="${node.size}" id="node-size-range"><br>`;
+            nodeDetailsContentStatic = ``;
+            nodeDetailsContentStatic += `<input type="range" min="30" max="500" value="${node.size}" id="node-size-range"><br>`;
             nodeDetailsContentStatic += `<button id="toggle-node-position-fixed">${node.positionFixed ? "Unfix Position" : "Fix Position"}</button><br>`;
             nodeDetailsContentStatic += `Fill color: <input id ="node-color-picker" value="${node.fill}" data-jscolor="{preset:'small dark', position:'right'}" onclick="canvasManager.blur();"><br> `;
             
             document.getElementById('node-details-content-static').innerHTML = nodeDetailsContentStatic;
-
-            const nodeSizeRange = document.getElementById('node-size-range');
-            nodeSizeRange.addEventListener('input', function () {
-                node.isResizing = true;
-                node.size = Number(nodeSizeRange.value);
-                canvasManager.nodeDetailsStaticContentInit = false;
-            });
-            nodeSizeRange.addEventListener('mouseout', function () {
-                node.isResizing = false;
-            });
-
-            const positionToggleButton = document.getElementById('toggle-node-position-fixed');
-            positionToggleButton.onclick = () => {
-                node.positionFixed = !node.positionFixed;
-                if (node.positionFixed) {
-                    node.fixedX = node.x;
-                    node.fixedY = node.y;
-                    positionToggleButton.textContent = node.positionFixed ? "Unfix Position" : "Fix Position";
-                    canvasManager.nodeDetailsStaticContentInit = false;
-                }
-            };
-            const nodeColorPicker = document.getElementById('node-color-picker');
-            new jscolor(nodeColorPicker);
-            nodeColorPicker.addEventListener('input', function () {
-                node.fill = nodeColorPicker.value;
-                canvasManager.nodeDetailsStaticContentInit = false;
-            });
+            
+            setUpNodeDetailsEvents(canvasManager, node);
 
         }
     } else {

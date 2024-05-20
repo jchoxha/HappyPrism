@@ -1,3 +1,4 @@
+import { Logger } from "../Debug/logger.js";
 function setUpUserEvents(canvasManager){
     const mouseEvents = ['mousedown', 'mouseup', 'mousemove', 'wheel'];
     const touchEvents = ['touchstart', 'touchend', 'touchmove', 'touchcancel'];
@@ -77,25 +78,24 @@ function handleEvent(event, canvasManager) {
 
 
 function handleStart(event, canvasManager) {
-    const { clientX, clientY } = event;
-    const { offsetX, offsetY } = getOffsets(clientX, clientY, canvasManager.canvas);
     let nodeFound = false;
     canvasManager.mousePositionOnDown = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y }
-    console.log("Mouse down at: ", canvasManager.mousePositionOnDown);
+    Logger.log("Mouse down at: ", canvasManager.mousePositionOnDown);
 
     
     for (let i = canvasManager.nodes.length - 1; i >= 0; i--) {
         const node = canvasManager.nodes[i];
-        if (isMouseOver(offsetX, offsetY, node, canvasManager)) {
+        if (isMouseOver(node, canvasManager)) {
+            Logger.log("Mouse over: ", node);
             if (canvasManager.highlightedNode == node && canvasManager.selectedNode != node) {
                 canvasManager.selectedNode = node;
-                console.log("Node selected: ", node)
+                Logger.log("Node selected: ", node)
             }
             else if (canvasManager.selectedNode != node) {
                 canvasManager.highlightedNode = node;
                 canvasManager.toggleNodeDetails = true;
                 canvasManager.nodeDetailsStaticContentInit = false;
-                console.log("Node highlighted: ", node);
+                Logger.log("Node highlighted: ", node);
             }
             if (canvasManager.selectedNode == node){
                 
@@ -118,10 +118,10 @@ function handleStart(event, canvasManager) {
             canvasManager.draggingCanvas = true;
             canvasManager.mousePositionOnMoveStart.x = canvasManager.currentmousePos.x;
             canvasManager.mousePositionOnMoveStart.y = canvasManager.currentmousePos.y;
-            console.log("draggingCanvas: ", canvasManager.draggingCanvas);
+            Logger.log("draggingCanvas: ", canvasManager.draggingCanvas);
         }
         
-        console.log("No node was selected");
+        Logger.log("No node was selected");
         canvasManager.selectedNode = null;
         canvasManager.highlightedNode = null;
     }
@@ -136,7 +136,7 @@ function handleEnd(event, canvasManager) {
     canvasManager.nodes.forEach(node => {
         if (node.dragging) {
             if (canvasManager.currentTime > canvasManager.mouseLastMoveTime) {
-                console.log("Node velocity canceled because " + (canvasManager.currentTime - canvasManager.mouseLastMoveTime) + " < 300");
+                Logger.log("Node velocity canceled because " + (canvasManager.currentTime - canvasManager.mouseLastMoveTime) + " < 300");
                 node.vx = 0;
                 node.vy = 0;
             }
@@ -157,6 +157,11 @@ function handleMove(event, canvasManager) {
         canvasManager.translateY += dy;
     } else {
         canvasManager.nodes.forEach(node => {
+            if (isMouseOver(node, canvasManager)) {
+                node.hovered = true; // Additional property to indicate node is hovered
+            } else {
+                node.hovered = false;
+            }
             if (node.dragging) {
                 const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnMoveLast.x);
                 const dy = (canvasManager.currentmousePos.y - canvasManager.mousePositionOnMoveLast.y);
@@ -185,23 +190,28 @@ function handleMove(event, canvasManager) {
 
 
 
+
 function updateMouseProperties(event, canvasManager) {
     const rect = canvasManager.canvas.getBoundingClientRect();
-    canvasManager.currentmousePos.x = (event.clientX - rect.left - canvasManager.translateX) / canvasManager.scale;
-    canvasManager.currentmousePos.y = (event.clientY - rect.top - canvasManager.translateY) / canvasManager.scale;
-    
+    canvasManager.currentmousePos.x = (event.clientX - (rect.left / 2) - canvasManager.translateX) / canvasManager.scale;
+    canvasManager.currentmousePos.y = (event.clientY - (rect.top / 2) - canvasManager.translateY) / canvasManager.scale;
 }
 
 
-function isMouseOver(mouseX, mouseY, node, canvasManager) {
-    // Check if the mouse is over a node, assuming circular nodes for simplicity
-    const adjustedX = (mouseX - canvasManager.translateX) / canvasManager.scale;
-    const adjustedY = (mouseY - canvasManager.translateY) / canvasManager.scale;
-    const dx = adjustedX - node.x;
-    const dy = adjustedY - node.y;
+
+function isMouseOver(node, canvasManager) {
+    const mouseX = canvasManager.currentmousePos.x;
+    const mouseY = canvasManager.currentmousePos.y;
+
+    // Calculate the distance between the mouse position and the node center
+    const dx = mouseX - node.x;
+    const dy = mouseY - node.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
+
+    // Check if the distance is within the node's size (assuming the node size represents the diameter)
     return distance < node.size / 2;
 }
+
 
 function handleWheel(event, canvasManager) {
     if (shouldPreventDefault(event, canvasManager)) {
@@ -209,8 +219,8 @@ function handleWheel(event, canvasManager) {
     }
 
     const zoomIntensity = 0.1;
-    const mouseX = (event.clientX - canvasManager.canvas.getBoundingClientRect().left - canvasManager.translateX) / canvasManager.scale;
-    const mouseY = (event.clientY - canvasManager.canvas.getBoundingClientRect().top - canvasManager.translateY) / canvasManager.scale;
+    const mouseX = canvasManager.currentmousePos.x;
+    const mouseY = canvasManager.currentmousePos.y;
 
     const delta = event.deltaY > 0 ? -zoomIntensity : zoomIntensity;
     const newScale = canvasManager.scale + delta;

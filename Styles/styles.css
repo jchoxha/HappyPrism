@@ -11,20 +11,49 @@ body {
 
 canvas {
     position: absolute;
-    top: 0;
+    top: 50px; /* Adjusted to account for the top bar */
     left: 0;
     background-color: lightgrey;
     width: 100vw; /* Ensures it takes the full viewport width */
-    height: 100vh; /* Ensures it takes the full viewport height */
+    height: calc(100vh - 50px); /* Ensures it takes the full viewport height minus the top bar height */
     border: none; /* Ensures no border is applied */
     z-index: 1; /* Sets z-index to ensure it is stacked under control buttons */
     box-sizing: border-box; /* Includes padding and border in the element's total width and height */
 }
 
+#top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ccc;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-sizing: border-box; /* Ensure padding is included in the height */
+    height: 50px; /* Set a fixed height for the top bar */
+}
+
+#node-title {
+    flex-grow: 1;
+    text-align: center;
+    font-size: 18px;
+}
+
+#back-button, #settings-button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
 #control-buttons {
     position: fixed;
     right: 10px;
-    top: 10px;
+    top: 60px; /* Adjusted to be below the top bar */
     display: flex;
     flex-direction: column;
     z-index: 2;
@@ -66,11 +95,10 @@ canvas {
     z-index: 10;
     background: rgba(0, 0, 0, 0.5);
     pointer-events: none;
-    
 }
 
 #node-details {
-    top: 10px;
+    top: 70px; /* Adjusted to be below the top bar */
     left: 10px;
 }
 
@@ -103,6 +131,7 @@ canvas {
     cursor: pointer;
     padding: 0px 0px 0px 20px !important;
 }
+
 #node-color-picker:focus {
     outline: none; /* Removes focus outline if still visible */
 }
@@ -120,7 +149,6 @@ canvas {
     right: 10px;
 }
 
-#canvas-details-content{
+#canvas-details-content {
     padding: 10px;
 }
-
