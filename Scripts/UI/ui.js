@@ -78,7 +78,7 @@ function loadUIDefault(){
       <img src="Assets/Images/Icons/ui/Button_Shape/circle.svg" alt="Add Shape">
       </button>
       <button id="add-text-button">
-      <img src="Assets/Images/Icons/ui/Button_Text/Text.svg" alt="Add Text">
+      <img src="Assets/Images/Icons/ui/Button_Text/text.svg" alt="Add Text">
       </button>
       <button id="draw-erase-button">
       <img src="Assets/Images/Icons/ui/Button_Draw/pencil.svg" alt="Draw or Erase">
