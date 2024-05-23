@@ -1,15 +1,22 @@
-import { getRandomColor } from "./colors.js";
+import { Logger } from "../Debug/logger.js";
 
 class Theme {
-    constructor() {
-        //Default App Colors
+    constructor(themeName = "default") {
 
+        this.themeName = themeName;
+
+        //Default / Light Theme
+        if(themeName == "default" || themeName == "light"){
         //UI
-        this.default_canvas_background = "#081622";
-        this.default_menu_background = "#013561";
-
+        this.menu_background = "#013561";
+        this.button_text_color = "#000000";
+        this.button_bg_color = "#f0f0f0";
+        //Canvas
+        this.canvas_background = "#F2F2F2";
+        this.canvas_grid_color = "#E5E5E5";
         //Nodes
-        this.default_node_fill = null;
+        this.node_fill = null;
+        }
     }
   
 
@@ -29,6 +36,7 @@ class Theme {
             shadowColor:'rgba(0,0,0,0.5)'
 
         };
+        Logger.log("Theme Initialized");
     }
 
 

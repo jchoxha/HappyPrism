@@ -1,7 +1,5 @@
-import { Logger } from '../../Debug/logger.js';
-import { nearestMultiple } from '../../Misc/utils.js';
-
-const gridInterval = 30;
+import { Logger } from '../../../Debug/logger.js';
+import { nearestMultiple } from '../../../Misc/utils.js';
 
 function drawCanvas(canvasManager) {
     canvasManager.ctx.clearRect(0, 0, canvasManager.canvas.width, canvasManager.canvas.height);
@@ -15,6 +13,8 @@ function drawCanvas(canvasManager) {
 
 function drawGrid(canvasManager) {
 
+    const gridInterval = canvasManager.gridInterval;
+
     if (canvasManager.topLeftY < 0 && canvasManager.bottomRightY > 0) {
         drawXAxis(canvasManager);
     }
@@ -26,6 +26,8 @@ function drawGrid(canvasManager) {
     let startPointX = nearestMultiple(canvasManager.topLeftX, gridInterval);
     let startPointY = nearestMultiple(canvasManager.topLeftY, gridInterval);
 
+    canvasManager.ctx.strokeStyle = canvasManager.gridColor;
+    canvasManager.ctx.lineWidth = 1;
     for (let i = 0; i <= numNorthSouthLines; i++) {
         canvasManager.ctx.beginPath();
         canvasManager.ctx.moveTo(startPointX + i * gridInterval, canvasManager.topLeftY);
@@ -45,7 +47,7 @@ function drawXAxis(canvasManager) {
     const bottomRightX =canvasManager.bottomRightX;
     const ctx = canvasManager.ctx;
     ctx.save();
-    ctx.strokeStyle = '#000000';
+    ctx.strokeStyle = canvasManager.gridColor;
     ctx.lineWidth = 2;
 
     ctx.beginPath();
@@ -61,7 +63,7 @@ function drawYAxis(canvasManager) {
     const ctx = canvasManager.ctx;
 
     ctx.save();
-    ctx.strokeStyle = '#000000';
+    ctx.strokeStyle = canvasManager.gridColor;
     ctx.lineWidth = 2;
 
     ctx.beginPath();

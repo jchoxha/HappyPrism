@@ -1,16 +1,16 @@
 import { Logger } from "../Debug/logger.js";
-import { setUpNodeDetailsEvents } from "../Events/uiEvents.js";
+import { setUpNodeDetailsEvents } from "../Events/CanvasEvents/canvasEvents.js";
 
 
 function updateCanvasUI(canvasManager){
     //Set canvas details content
-    setContentCanvasDetails(canvasManager)
+    //setContentCanvasDetails(canvasManager)
 
     //set node details content
     if (canvasManager.highlightedNode && canvasManager.toggleNodeDetails) {
-        setContentNodeDetails(canvasManager, canvasManager.highlightedNode);
+        //setContentNodeDetails(canvasManager, canvasManager.highlightedNode);
     } else {
-        setContentNodeDetails(canvasManager);
+        //setContentNodeDetails(canvasManager);
     }
 }
 

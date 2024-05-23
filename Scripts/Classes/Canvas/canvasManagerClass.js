@@ -1,5 +1,5 @@
 // canvasManager.js
-import { drawCanvas } from './drawCanvas.js';
+import { drawCanvas } from './methods/drawCanvas.js';
 
 class CanvasManager {
     constructor(canvasId) {
@@ -48,11 +48,16 @@ class CanvasManager {
 
         // Canvas Details
         this.toggleCanvasDetails = false;
+
+        //Grid
+        this.gridColor = null;
+        this.gridInterval = 200;
     }
 
-    initCanvas(theme) {
-        this.theme = theme;
-        this.canvas.style.background = theme.canvas_background;
+    initCanvas(appManager) {
+        this.theme = appManager.theme;
+        this.canvas.style.background = this.theme.canvas_background;
+        this.gridColor = this.theme.canvas_grid_color;
         this.resizeCanvas();
         window.addEventListener('resize', this.resizeCanvas.bind(this));
     }
