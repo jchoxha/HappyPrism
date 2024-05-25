@@ -1,0 +1,126 @@
+#top-bar {
+    position: absolute;
+    top: 2vh;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+#top-left, #top-center, #top-right {
+    position: absolute;
+    pointer-events: auto;
+    border-radius: 10px;
+    z-index: 1000;  
+}
+
+
+#top-left {
+    height: 50px;
+    left: 1vw;
+    display: flex;  /* Add this line */
+    align-items: center;  /* Align items vertically centered */
+    background-color: #f0f0f0;
+    overflow: hidden;
+    box-shadow:
+  0.9px 1.2px 2.4px rgba(0, 0, 0, 0.062),
+  2.2px 3px 6px rgba(0, 0, 0, 0.089),
+  4.4px 6.2px 12.2px rgba(0, 0, 0, 0.111),
+  9.1px 12.8px 25.2px rgba(0, 0, 0, 0.138),
+  25px 35px 69px rgba(0, 0, 0, 0.2)
+;
+}
+
+#home-button {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    left: 0;
+    border: none;
+    pointer-events: auto;
+    margin: 2px 0px 2px 5px;
+  }
+  
+  #home-button:hover {
+    background: none !important; /* Remove background highlight */
+  }
+  
+  .cropped-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+  }
+  
+  #home-button img {
+    width: 50px;
+    height: 50px;
+  }
+  
+  #app-name {
+    display:flex;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 100; 
+    font-style: italic;
+    font-size: 24px;
+    color: #000000; 
+    margin-right: 5px;
+  }
+
+
+#top-center {
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; 
+    
+}
+
+#main-title-div, #secondary-title-div, #tertiary-title-div {
+    padding:1px 10px;
+    margin-bottom: 5px;
+    background-color: #f0f0f0;
+    border-radius: 30px;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    box-shadow:
+  0.9px 1.2px 2.4px rgba(0, 0, 0, 0.062),
+  2.2px 3px 6px rgba(0, 0, 0, 0.089),
+  4.4px 6.2px 12.2px rgba(0, 0, 0, 0.111),
+  9.1px 12.8px 25.2px rgba(0, 0, 0, 0.138),
+  25px 35px 69px rgba(0, 0, 0, 0.2)
+;
+}
+
+#main-title-div {
+    font-size: 20px;
+}
+
+#secondary-title-div {
+    display:none;
+    font-size: 16px;
+}
+
+#tertiary-title-div {
+    display:none;
+    font-size: 14px;
+}
+
+#top-right {
+    right: 1vw;
+}
+
+#top-right button{
+    background: none;
+    border: none;
+    justify-content: center;
+    align-items: center; 
+}
+
+#top-right button img{
+    width: 40px;
+    height: 40px;
+}

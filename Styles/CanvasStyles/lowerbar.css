@@ -1,0 +1,131 @@
+
+#lower-bar {
+    bottom: 2vh;
+}
+
+#lower-left {
+    left: 1vw;
+}
+
+#lower-left button{
+    background: none;
+    border: none;
+    justify-content: center;
+    align-items: center; 
+}
+
+#lower-left button img {
+    width: 35px;
+    height: 35px;
+}
+
+#lower-left, #lower-center, #lower-right {
+    position: absolute;
+    pointer-events: auto;
+    border-radius: 10px;
+    z-index: 1000;
+    bottom: 2vh;
+}
+
+#lower-center {
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    background-color: #f0f0f0;
+    box-shadow:
+  0.9px 1.2px 2.4px rgba(0, 0, 0, 0.062),
+  2.2px 3px 6px rgba(249, 248, 248, 0.089),
+  4.4px 6.2px 12.2px rgba(0, 0, 0, 0.111),
+  9.1px 12.8px 25.2px rgba(0, 0, 0, 0.138),
+  25px 35px 69px rgba(0, 0, 0, 0.2)
+;
+justify-content: center;
+align-items: center; 
+}
+
+#lower-center button{
+    background: none;
+    border: none;
+    width:48px;
+    height: 48px;
+    justify-content: center;
+    align-items: center; 
+}
+
+#lower-center button img{
+    width: 40px;
+    height: 40px; 
+}
+
+#lower-right {
+    right: 1vw;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    background-color: #f0f0f0;
+    box-shadow:
+  0.9px 1.2px 2.4px rgba(0, 0, 0, 0.062),
+  2.2px 3px 6px rgba(249, 248, 248, 0.089),
+  4.4px 6.2px 12.2px rgba(0, 0, 0, 0.111),
+  9.1px 12.8px 25.2px rgba(0, 0, 0, 0.138),
+  25px 35px 69px rgba(0, 0, 0, 0.2)
+    ;
+}
+
+#lower-right button{
+    background: none;
+    border: none;
+    justify-content: center;
+    align-items: center; 
+}
+
+#lower-right button img{
+    width: 35px;
+    height: 35px; 
+}
+
+
+/*Pop up bar*/
+
+#lower-bar-popups {
+    position: absolute;
+    bottom: 2vh;
+    height: 10px;
+    background-color: black;
+    z-index: 1000; /* Make sure it appears above the lower bar */
+    pointer-events: none; /* If you want the popups to be interactive, remove this line */
+}
+
+#lower-center-popup {
+    border-radius: 10px;
+    position: absolute;
+    bottom: 50px; /* 2vh from the bottom plus 2px space */
+    margin-bottom: 1.5vh;
+    left: 50vw;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    background-color: #f0f0f0;
+    box-shadow:
+  0.9px 1.2px 2.4px rgba(0, 0, 0, 0.062),
+  2.2px 3px 6px rgba(249, 248, 248, 0.089),
+  4.4px 6.2px 12.2px rgba(0, 0, 0, 0.111),
+  9.1px 12.8px 25.2px rgba(0, 0, 0, 0.138),
+  25px 35px 69px rgba(0, 0, 0, 0.2)
+;
+justify-content: center;
+align-items: center; 
+}
+
+#lower-center-popup button{
+    pointer-events: auto;
+    border: none;
+}
+
+#lower-center-popup button img{
+    width: 40px;
+    height: 40px; 
+}

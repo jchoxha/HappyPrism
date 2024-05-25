@@ -1,4 +1,5 @@
 import { Logger } from '../../../Debug/logger.js';
+import { getRandomColor } from '../../../Misc/colors.js';
 import { nearestMultiple } from '../../../Misc/utils.js';
 
 function drawCanvas(canvasManager) {
@@ -27,7 +28,7 @@ function drawGrid(canvasManager) {
     let startPointY = nearestMultiple(canvasManager.topLeftY, gridInterval);
 
     canvasManager.ctx.strokeStyle = canvasManager.gridColor;
-    canvasManager.ctx.lineWidth = 1;
+    canvasManager.ctx.lineWidth = 2;
     for (let i = 0; i <= numNorthSouthLines; i++) {
         canvasManager.ctx.beginPath();
         canvasManager.ctx.moveTo(startPointX + i * gridInterval, canvasManager.topLeftY);
@@ -48,7 +49,7 @@ function drawXAxis(canvasManager) {
     const ctx = canvasManager.ctx;
     ctx.save();
     ctx.strokeStyle = canvasManager.gridColor;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 4;
 
     ctx.beginPath();
     ctx.moveTo(topLeftX, 0);
@@ -64,7 +65,7 @@ function drawYAxis(canvasManager) {
 
     ctx.save();
     ctx.strokeStyle = canvasManager.gridColor;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 4;
 
     ctx.beginPath();
     ctx.moveTo(0, topLeftY);
@@ -78,7 +79,7 @@ function drawNode(canvasManager, node) {
     const radius = size / 2;
     canvasManager.ctx.beginPath();
     if (node.shapeType.name === 'circle') {
-        canvasManager.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        drawElipse(canvasManager, x, y, radius);
     } else if (node.shapeType.isPolygon) {
         drawPolygon(canvasManager, x, y, node.shapeType.numSides, radius);
     } else {
@@ -95,6 +96,58 @@ function drawNode(canvasManager, node) {
     }
 }
 
+function drawTemporaryShape(canvasManager) {
+    console.log("Drawing temporary shape");
+    const ctx = canvasManager.ctx;
+
+    //We have to redraw the canvas each time this is called 
+    //  so that the temporary shape is not drawn on top of the previous one
+    drawCanvas(canvasManager);
+    canvasManager.update();
+    const startX = canvasManager.IM3shapeStartPos.x * canvasManager.scale + (canvasManager.translateX);
+    const startY = canvasManager.IM3shapeStartPos.y * canvasManager.scale+ (canvasManager.translateY);
+    const width = (canvasManager.IM3shapeEndPos.x * canvasManager.scale + (canvasManager.translateX) - startX);
+    const height = (canvasManager.IM3shapeEndPos.y * canvasManager.scale +(canvasManager.translateY) - startY);
+
+    if (canvasManager.IM3shapeType === "elipse") {
+        drawElipse(canvasManager, startX, startY, width, height);
+    }
+    else if (canvasManager.IM3shapeType === "rectangle") {
+        drawPolygon(canvasManager, startX, startY, 4, Math.abs(width));
+    }
+    ctx.closePath();
+    if (canvasManager.IM3fillStyle == "solidColor") {
+        ctx.fillStyle = canvasManager.IM3fill;
+        ctx.fill();
+    } else {
+        //Logger.error("No fill style found, using black instead");
+        ctx.fillStyle = getRandomColor();
+        ctx.fill();
+    }
+}
+
+function drawElipse(canvasManager, x, y, width, height) {
+    const ctx = canvasManager.ctx;
+
+    // Adjust coordinates for negative width/height
+    if (width < 0) {
+        x += width;
+        width = -width;
+    }
+    if (height < 0) {
+        y += height;
+        height = -height;
+    }
+    ctx.lineWidth = .1 * ((width + height) / 2);
+    ctx.strokeStyle = "black";
+    ctx.beginPath();
+    ctx.ellipse(x + width / 2, y + height / 2, width / 2, height / 2, 0, 0, 2 * Math.PI);
+    ctx.stroke();
+    ctx.closePath();
+}
+
+
+
 function drawPolygon(canvasManager, x, y, numSides, radius) {
     canvasManager.ctx.moveTo(x + radius, y);
     for (let i = 1; i <= numSides; i++) {
@@ -102,4 +155,4 @@ function drawPolygon(canvasManager, x, y, numSides, radius) {
     }
 }
 
-export { drawCanvas }
+export { drawCanvas, drawTemporaryShape }

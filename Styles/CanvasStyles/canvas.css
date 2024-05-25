@@ -1,0 +1,85 @@
+canvas {
+    position: absolute;
+    top: 0; 
+    left: 0;
+    background-color: lightgrey;
+    width: 100vw;
+    height: 100vh;
+    border: none; 
+    z-index: 1; 
+    box-sizing: border-box; 
+}
+
+.tippy-box {
+    font-family: 'Poppins', sans-serif; 
+}
+
+.button-overlay {
+    position: relative;
+}
+
+.button-overlay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.1); /* Low opacity dark overlay */
+    pointer-events: none;
+    border-radius: 10px;
+}
+
+.button-active {
+    background-color: lightgrey !important; /* Same as hover background color */
+}
+
+button:hover {
+    transition: background-color 0.3s;
+    background-color: lightgrey;
+}
+
+button {
+    margin:3px;
+    border-radius: 10px;
+    transition: background-color 0.3s;
+    background-color: none;
+}
+
+.menuBarDiv {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+.menuDiv {
+    position: absolute;
+    justify-content: center;
+    align-items: center; 
+    pointer-events: auto;
+    border-radius: 10px;
+    z-index: 1000;
+    background-color: #f0f0f0;  
+    box-shadow:
+  0.9px 1.2px 2.4px rgba(0, 0, 0, 0.062),
+  2.2px 3px 6px rgba(0, 0, 0, 0.089),
+  4.4px 6.2px 12.2px rgba(0, 0, 0, 0.111),
+  9.1px 12.8px 25.2px rgba(0, 0, 0, 0.138),
+  25px 35px 69px rgba(0, 0, 0, 0.2)
+;
+}
+
+#top-bar button:hover, #lower-bar button:hover, #lower-bar-popups button:hover {
+    transition: background-color 0.3s;
+    background-color: lightgrey;
+}
+
+#top-bar button, #lower-bar button #lower-bar-popups button{
+    margin:3px;
+    border-radius: 10px;
+    transition: background-color 0.3s;
+    background-color: none;
+    border: none;
+}

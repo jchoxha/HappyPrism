@@ -1,5 +1,6 @@
 import { Logger } from "../Debug/logger.js";
 import { updateCanvasUI } from "./canvasUI.js";
+import { updateEventListeners } from "../Events/eventManager.js";
 
 
 function loadUI(appManager){
@@ -12,8 +13,18 @@ function loadUI(appManager){
     }
 }
 
-function updateUI (canvasManager){
-    updateCanvasUI(canvasManager);
+function updateUI (appManager){
+    updateStyles();
+    updateCanvasUI(appManager);
+    updateEventListeners(appManager);
+}
+
+function updateStyles(){
+    document.querySelector("body").style.cursor = "url('Assets/Images/Cursors/Select/cursor_select.cur'), url('Assets/Images/Cursors/Select/cursor_select.svg'), auto";
+    const allButtons = document.querySelectorAll("button");
+    allButtons.forEach(button => {
+      button.style.cursor = "url('Assets/Images/Cursors/Pointer/pointer.svg'), pointer";
+    });
 }
 
 function loadUIDefault(){
@@ -21,7 +32,7 @@ function loadUIDefault(){
   /*HTML*/
   let defaultHTML = `
   <div id="top-bar">
-    <div id="top-left">
+    <div id="top-left" class = "menuDiv">
       <button id="home-button">
         <img src="Assets/Images/Icons/ui/Button_Home/LogoDarkLargeNoBG.svg" alt="Home">
         <span id="app-name">
@@ -49,7 +60,7 @@ function loadUIDefault(){
         <span id="tertiary-title">Tertiary Title</span>
       </div>
     </div>
-    <div id="top-right">
+    <div id="top-right" class = "menuDiv">
       <button id="search-button">
       <img src="Assets/Images/Icons/ui/Button_Search/search.svg" alt="Search">
       </button>
@@ -61,8 +72,11 @@ function loadUIDefault(){
       </button>
     </div>
   </div>
+  <div id="lower-bar-popups">
+  <div id="lower-center-popup"></div>
+  </div>
   <div id="lower-bar">
-    <div id="lower-left">
+    <div id="lower-left" class = "menuDiv">
       <button id="undo-button">
       <img src="Assets/Images/Icons/ui/Button_Undo/undo.svg" alt="Undo">
       </button>

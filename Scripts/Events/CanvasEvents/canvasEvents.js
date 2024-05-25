@@ -1,12 +1,20 @@
 import { Logger } from "../../Debug/logger.js";
-import {setUpCanvasBarEvents} from "./canvasBarEvents.js"
+import {setUpCanvasBarEvents, updateCanvasBarEvents} from "./canvasBarEvents.js"
+import { closeAllPopups } from "../../UI/canvasUI.js"
 
-function setUpCanvasEvents(canvasManager){
-    setUpCanvasUIEvents(canvasManager);
-    setUpCanvasPointerEvents(canvasManager);
-    setUpCanvasBarEvents(canvasManager);
+let canvasManager = null;
+
+
+function setUpCanvasEvents(appManager){
+    canvasManager = appManager.canvasManager;
+    setUpCanvasPointerEvents();
+    setUpCanvasBarEvents(appManager);
 }
 
+function updateCanvasEvents(appManager){
+    canvasManager = appManager.canvasManager;
+    updateCanvasBarEvents(appManager);
+}
 
 function setUpCanvasUIEvents(canvasManager) {
     // const addButton = document.getElementById('add-node');
@@ -92,19 +100,19 @@ function setUpNodeDetailsEvents(canvasManager, node) {
     });
 }
 
-function setUpCanvasPointerEvents(canvasManager){
+function setUpCanvasPointerEvents(){
     const mouseEvents = ['mousedown', 'mouseup', 'mousemove', 'wheel'];
     const touchEvents = ['touchstart', 'touchend', 'touchmove', 'touchcancel'];
 
     mouseEvents.forEach(event => {
         canvasManager.canvas.addEventListener(event, (event) => {
-            handlePointerEvent(event, canvasManager);
+            handlePointerEvent(event);
         }, { passive: false });
     });
 
     touchEvents.forEach(event => {
         canvasManager.canvas.addEventListener(event, (event) => {
-            handleTouchEvent(event, canvasManager);
+            handleTouchEvent(event);
         }, { passive: false });
     });
 
@@ -113,7 +121,7 @@ function setUpCanvasPointerEvents(canvasManager){
 let initialPinchDistance = null;
 let lastScale = 1;
 
-function handleTouchEvent(event, canvasManager) {
+function handleTouchEvent(event) {
     if (event.touches.length > 1) {
         // Handle pinch
         const touch1 = event.touches[0];
@@ -140,140 +148,170 @@ function handleTouchEvent(event, canvasManager) {
         const touch = event.touches[0];
         event.clientX = touch.clientX;
         event.clientY = touch.clientY;
-        handlePointerEvent(event, canvasManager);
+        handlePointerEvent(event);
     }
 
     if (event.type === 'touchend' || event.type === 'touchcancel') {
         initialPinchDistance = null;
-        handleEnd(event, canvasManager);
+        handleEnd(event);
     }
 }
 
-function handlePointerEvent(event, canvasManager) {
+function handlePointerEvent(event) {
     switch (event.type) {
         case 'mousedown':
         case 'touchstart':
-            handleStart(event, canvasManager);
+            handleStart(event);
             break;
         case 'mouseup':
         case 'touchend':
-            handleEnd(event, canvasManager);
+            handleEnd(event);
             break;
         case 'mousemove':
         case 'touchmove':
-            handleMove(event, canvasManager);
+            handleMove(event);
             break;
         case 'wheel':
-            handleWheel(event, canvasManager);
+            handleWheel(event);
             break;
     }
 }
 
 
-function handleStart(event, canvasManager) {
+function handleStart(event) {
     let nodeFound = false;
     canvasManager.mousePositionOnDown = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y }
     Logger.log("Mouse down at: ", canvasManager.mousePositionOnDown);
+    closeAllPopups();
 
+    if (canvasManager.interactionMode == "selectCanvas"){
+        for (let i = canvasManager.nodes.length - 1; i >= 0; i--) {
+            const node = canvasManager.nodes[i];
+            if (isMouseOver(node, canvasManager)) {
+                Logger.log("Mouse over: ", node);
+                if (canvasManager.highlightedNode == node && canvasManager.selectedNode != node) {
+                    canvasManager.selectedNode = node;
+                    Logger.log("Node selected: ", node)
+                }
+                else if (canvasManager.selectedNode != node) {
+                    canvasManager.highlightedNode = node;
+                    canvasManager.toggleNodeDetails = true;
+                    canvasManager.nodeDetailsStaticContentInit = false;
+                    Logger.log("Node highlighted: ", node);
+                }
+                if (canvasManager.selectedNode == node){
+                    
+                    node.dragging = true;
+                    canvasManager.highlightedNode = node;
+                    canvasManager.toggleNodeDetails = true;
+                    canvasManager.nodeDetailsStaticContentInit = false;
+                    canvasManager.mousePositionOnMoveStart.x = canvasManager.currentmousePos.x;
+                    canvasManager.mousePositionOnMoveStart.y = canvasManager.currentmousePos.y;
+                }
+                nodeFound = true;
+                return;  // Stop searching once a node is found
+            }
+        }
     
-    for (let i = canvasManager.nodes.length - 1; i >= 0; i--) {
-        const node = canvasManager.nodes[i];
-        if (isMouseOver(node, canvasManager)) {
-            Logger.log("Mouse over: ", node);
-            if (canvasManager.highlightedNode == node && canvasManager.selectedNode != node) {
-                canvasManager.selectedNode = node;
-                Logger.log("Node selected: ", node)
-            }
-            else if (canvasManager.selectedNode != node) {
-                canvasManager.highlightedNode = node;
-                canvasManager.toggleNodeDetails = true;
-                canvasManager.nodeDetailsStaticContentInit = false;
-                Logger.log("Node highlighted: ", node);
-            }
-            if (canvasManager.selectedNode == node){
-                
-                node.dragging = true;
-                canvasManager.highlightedNode = node;
-                canvasManager.toggleNodeDetails = true;
-                canvasManager.nodeDetailsStaticContentInit = false;
+    
+        // Log the state if no nodes are selected
+        if (!nodeFound) {
+            if (!canvasManager.draggingCanvas) {
+                canvasManager.draggingCanvas = true;
                 canvasManager.mousePositionOnMoveStart.x = canvasManager.currentmousePos.x;
                 canvasManager.mousePositionOnMoveStart.y = canvasManager.currentmousePos.y;
+                Logger.log("draggingCanvas: ", canvasManager.draggingCanvas);
+                canvasManager.setNeedsUpdating(true);
+
             }
-            nodeFound = true;
-            return;  // Stop searching once a node is found
+            
+            Logger.log("No node was selected");
+            canvasManager.selectedNode = null;
+            canvasManager.highlightedNode = null;
         }
     }
-
-
-    // Log the state if no nodes are selected
-    if (!nodeFound) {
-        if (!canvasManager.draggingCanvas) {
-            canvasManager.draggingCanvas = true;
-            canvasManager.mousePositionOnMoveStart.x = canvasManager.currentmousePos.x;
-            canvasManager.mousePositionOnMoveStart.y = canvasManager.currentmousePos.y;
-            Logger.log("draggingCanvas: ", canvasManager.draggingCanvas);
-        }
-        
-        Logger.log("No node was selected");
-        canvasManager.selectedNode = null;
-        canvasManager.highlightedNode = null;
+    if (canvasManager.interactionMode == "addShape"){
+        canvasManager.IM3draggingShape = true;
+        canvasManager.IM3shapeStartPos = { x: canvasManager.mousePositionOnDown.x, y: canvasManager.mousePositionOnDown.y };
+        console.log("Shape start position: ", canvasManager.IM3shapeStartPos);
+        console.log("Visible width and height: ", canvasManager.visibleWidth +", " + canvasManager.visibleHeight);
+        console.log("TranslateX & Y: ", canvasManager.translateX + ", " + canvasManager.translateY);
+        console.log("Canvas Scale: ", canvasManager.scale);
     }
 }
 
-function handleEnd(event, canvasManager) {
+function handleEnd(event) {
     canvasManager.mousePositionOnUp = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y };
-    canvasManager.draggingCanvas = false;
-
-    const now = canvasManager.currentTime;
-
-    canvasManager.nodes.forEach(node => {
-        if (node.dragging) {
-            if (canvasManager.currentTime > canvasManager.mouseLastMoveTime) {
-                Logger.log("Node velocity canceled because " + (canvasManager.currentTime - canvasManager.mouseLastMoveTime) + " < 300");
-                node.vx = 0;
-                node.vy = 0;
+    if (canvasManager.interactionMode == "selectCanvas"){
+        
+        if(canvasManager.draggingCanvas)
+            {
+                canvasManager.draggingCanvas = false;
+                canvasManager.setNeedsUpdating(false);
             }
-            node.dragging = false;
-            node.inMovementAfterDragging = true;
+        else{
+            canvasManager.nodes.forEach(node => {
+                if (node.dragging) {
+                    if(canvasManager.physicsEnabled){
+                        if (canvasManager.currentTime > canvasManager.mouseLastMoveTime) {
+                            Logger.log("Node velocity canceled because " + (canvasManager.currentTime - canvasManager.mouseLastMoveTime) + " < 300");
+                            node.vx = 0;
+                            node.vy = 0;
+                        }
+                    }
+                    node.dragging = false;
+                    node.inMovementAfterDragging = true;
+                }
+            });
         }
-    });
+    }
+    if (canvasManager.interactionMode == "addShape" && canvasManager.IM3draggingShape) {
+        canvasManager.IM3draggingShape = false;
+        //addShapeToCanvas(canvasManager);
+    }
 }
 
 
 
-function handleMove(event, canvasManager) {
+function handleMove(event) {
 
-    if (canvasManager.draggingCanvas) {
-        const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnMoveStart.x) * canvasManager.scale;
-        const dy = (canvasManager.currentmousePos.y - canvasManager.mousePositionOnMoveStart.y) * canvasManager.scale;
-        canvasManager.translateX += dx;
-        canvasManager.translateY += dy;
-    } else {
-        canvasManager.nodes.forEach(node => {
-            if (isMouseOver(node, canvasManager)) {
-                node.hovered = true; // Additional property to indicate node is hovered
-            } else {
-                node.hovered = false;
-            }
-            if (node.dragging) {
-                const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnMoveLast.x);
-                const dy = (canvasManager.currentmousePos.y - canvasManager.mousePositionOnMoveLast.y);
-
-                const newX = node.x + dx;
-                const newY = node.y + dy;
-
-                node.vx = newX - node.x;
-                node.vy = newY - node.y;
-
-                node.x = newX;
-                node.y = newY;
-
-                if (!node.positionFixed) {
-                    node.intendedX = node.x;
-                    node.intendedY = node.y;
+    if(canvasManager.interactionMode == "selectCanvas"){
+        if (canvasManager.draggingCanvas) {
+            const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnMoveStart.x) * canvasManager.scale;
+            const dy = (canvasManager.currentmousePos.y - canvasManager.mousePositionOnMoveStart.y) * canvasManager.scale;
+            canvasManager.translateX += dx;
+            canvasManager.translateY += dy;
+        } else {
+            canvasManager.nodes.forEach(node => {
+                if (isMouseOver(node, canvasManager)) {
+                    node.hovered = true; // Additional property to indicate node is hovered
+                } else {
+                    node.hovered = false;
                 }
-            }
-        });
+                if (node.dragging) {
+                    const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnMoveLast.x);
+                    const dy = (canvasManager.currentmousePos.y - canvasManager.mousePositionOnMoveLast.y);
+
+                    const newX = node.x + dx;
+                    const newY = node.y + dy;
+
+                    node.vx = newX - node.x;
+                    node.vy = newY - node.y;
+
+                    node.x = newX;
+                    node.y = newY;
+
+                    if (!node.positionFixed) {
+                        node.intendedX = node.x;
+                        node.intendedY = node.y;
+                    }
+                }
+            });
+        }
+    }
+    if(canvasManager.interactionMode == "addShape" && canvasManager.IM3draggingShape){
+        canvasManager.IM3shapeEndPos = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y };
+        canvasManager.drawTempShape();
     }
     canvasManager.mousePositionOnMoveLast.x = canvasManager.currentmousePos.x;
     canvasManager.mousePositionOnMoveLast.y = canvasManager.currentmousePos.y;
@@ -284,7 +322,7 @@ function handleMove(event, canvasManager) {
 
 
 
-function updateMouseProperties(event, canvasManager) {
+function updateMouseProperties(event) {
     const rect = canvasManager.canvas.getBoundingClientRect();
     canvasManager.currentmousePos.x = (event.clientX - (rect.left / 2) - canvasManager.translateX) / canvasManager.scale;
     canvasManager.currentmousePos.y = (event.clientY - (rect.top / 2) - canvasManager.translateY) / canvasManager.scale;
@@ -292,7 +330,7 @@ function updateMouseProperties(event, canvasManager) {
 
 
 
-function isMouseOver(node, canvasManager) {
+function isMouseOver(node) {
     const mouseX = canvasManager.currentmousePos.x;
     const mouseY = canvasManager.currentmousePos.y;
 
@@ -306,8 +344,8 @@ function isMouseOver(node, canvasManager) {
 }
 
 
-function handleWheel(event, canvasManager) {
-    if (shouldPreventDefault(event, canvasManager)) {
+function handleWheel(event) {
+    if (shouldPreventDefault(event)) {
         event.preventDefault();  // Prevent the page from scrolling
     }
 
@@ -326,10 +364,11 @@ function handleWheel(event, canvasManager) {
     canvasManager.translateY -= mouseY * (scale - canvasManager.scale);
     
     canvasManager.scale = scale;
+    canvasManager.setNeedsUpdating(true, 1);
 }
 
 // This function decides when to call preventDefault based on your specific logic
-function shouldPreventDefault(event, canvasManager) {
+function shouldPreventDefault(event) {
     const rect = canvasManager.canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -345,4 +384,4 @@ function getOffsets(clientX, clientY, canvas) {
     };
 }
 
-export { setUpCanvasEvents, setUpNodeDetailsEvents };
+export { setUpCanvasEvents, updateCanvasEvents };

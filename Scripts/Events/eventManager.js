@@ -1,10 +1,14 @@
 // eventManager.js
 
-import { setUpCanvasEvents } from "./CanvasEvents/canvasEvents.js";
+import { setUpCanvasEvents, updateCanvasEvents } from "./CanvasEvents/canvasEvents.js";
 
 
 function setupEventListeners(appManager) {
-    setUpCanvasEvents(appManager.canvasManager);
+    setUpCanvasEvents(appManager);
 }
 
-export { setupEventListeners };
+function updateEventListeners(appManager) {
+    updateCanvasEvents(appManager);
+}
+
+export { setupEventListeners, updateEventListeners };

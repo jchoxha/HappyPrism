@@ -1,10 +1,15 @@
 // canvasManager.js
-import { drawCanvas } from './methods/drawCanvas.js';
+import { Logger } from '../../Debug/logger.js';
+import { drawCanvas, drawTemporaryShape } from './methods/drawCanvas.js';
 
 class CanvasManager {
     constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
+
+        this.needsUpdating = true; //Controls whether update code will run
+        this.numUpdatesScheduled = 0; //If 0, will continuously update when needsUpdating is true
+        this.updateCount = 0;
 
         this.physicsEnabled = false;
 
@@ -40,7 +45,30 @@ class CanvasManager {
         this.mouseLastMoveTime = null;
         this.mouseLastMovePos = { x: null, y: null };
 
+        //Canvas Interaction Mode
+            //Possible values (with Interaction Mode ID Number):
+            //selectCanvas (IM1), dragCanvas(IM2), addShape(IM3), 
+            this.interactionMode = "selectCanvas";
+                //addShape (IM3) properties
+                    //Possible values: circle, rectangle
+                    this.IM3shapeType = "elipse";
+                    this.IM3draggingShape = false;
+                    this.IM3shapeStartPos = { x: 0, y: 0 };
+                    this.IM3shapeEndPos = { x: 0, y: 0 };
+                    this.IM3fillStyle = null;
+                    this.IM3fill = null;
+
         // CANVAS UI ELEMNENTS
+
+            //Popups
+            this.popUpOpen = false;
+
+            //Lower Bar
+
+                //Select or Drag Menu
+                this.toggleSelectOrDragMenu = false;
+                //AddShapeMenu
+                this.toggleAddShapeMenu = false;
 
         // Node Details
         this.toggleNodeDetails = false;
@@ -63,10 +91,46 @@ class CanvasManager {
     }
 
     update() {
-        this.currentTime = Date.now();
-        this.updateCanvasRange();
-        drawCanvas(this);
+        //console.log("Attempting to update canvas")
+        if(this.needsUpdating) {
+
+
+            //Actuall stuff to update///
+            this.currentTime = Date.now();
+            this.updateCanvasRange();
+            drawCanvas(this);
+            //End of important update code///
+
+            //After first update, set needsUpdating to false
+            if (this.updateCount == 0) {
+                this.setNeedsUpdating(false);
+            }
+            
+            //Increment update count
+            this.updateCount++;
+
+            //Check if number of updates is limited 
+            //  e.g. when scrolling, we only want one update per call
+            if(this.numUpdatesScheduled > 0){
+                this.numUpdatesScheduled--;
+                if(this.numUpdatesScheduled == 0){
+                    this.setNeedsUpdating(false);
+                }
+            }
+            return;
+        }
+        //console.log("Canvas not updated");
     }
+
+    setNeedsUpdating(needsUpdating, times = 0) {
+        this.needsUpdating = needsUpdating;
+        Logger.log('CanvasManager.needsUpdating set to: ', this.needsUpdating);
+        if (times > 0){
+            this.numUpdatesScheduled = times;
+            Logger.log('CanvasManager.numUpdatesScheduled set to: ', this.numUpdatesScheduled);
+        }
+    }
+
 
     resizeCanvas() {
         const rect = canvas.getBoundingClientRect();
@@ -85,8 +149,9 @@ class CanvasManager {
         this.visibleHeight = this.bottomRightY - this.topLeftY;
     }
 
-
-
+    drawTempShape() {
+        drawTemporaryShape(this);
+    }
 }
 
 export { CanvasManager };

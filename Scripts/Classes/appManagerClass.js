@@ -10,6 +10,7 @@ class AppManager {
 
         //Debug
         this.debugMode = false;
+        Logger.setReturnFullFilePath(false);
         Logger.setDebugMode(this.debugMode);
 
         //Load Dependencies
@@ -58,7 +59,7 @@ class AppManager {
 
     // Add more methods as needed
     update() {
-        if (this.canvasManager != null){
+        if (this.canvasManager != null && this.canvasManager.needsUpdating){
             this.canvasManager.update();
             if (this.canvasManager.physicsEnabled) {
                 physicsUpdate(this.canvasManager);

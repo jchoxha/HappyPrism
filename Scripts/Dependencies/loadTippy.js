@@ -24,7 +24,6 @@ function loadTippyJS() {
             tippyPerspectiveAnimationLink.rel = 'stylesheet';
             tippyPerspectiveAnimationLink.href = 'https://unpkg.com/tippy.js@6/animations/perspective.css';
             document.head.appendChild(tippyPerspectiveAnimationLink);
-            Logger.log(tippyPerspectiveAnimationLink);
             initializeTippy();
         };
     };
@@ -36,16 +35,16 @@ function initializeTippy() {
     initializeTippySingletons();
 }
 
-function initializeTippySingletons() {
-    const buttonGroups = [
-        { selector: '#top-left button', placement: 'bottom' },
-        { selector: '#top-center button', placement: 'bottom' },
-        { selector: '#top-right button', placement: 'bottom' },
-        { selector: '#lower-left button', placement: 'top' },
-        { selector: '#lower-center button', placement: 'top' },
-        { selector: '#lower-right button', placement: 'top' }
-    ];
+const buttonGroups = [
+    { selector: '#top-left button', placement: 'bottom' },
+    { selector: '#top-center button', placement: 'bottom' },
+    { selector: '#top-right button', placement: 'bottom' },
+    { selector: '#lower-left button', placement: 'top' },
+    { selector: '#lower-center button', placement: 'top' },
+    { selector: '#lower-right button', placement: 'top' }
+];
 
+function initializeTippySingletons() {
     buttonGroups.forEach(group => initializeTippyGroup(group.selector, group.placement));
 }
 
@@ -70,5 +69,6 @@ function initializeTippyGroup(selector, placement) {
         overrides: ['placement', 'theme', 'animation', 'arrow', 'interactive', 'allowHTML', 'touch'] // Explicitly override these options
     });
 }
+
 
 export { loadTippyJS };

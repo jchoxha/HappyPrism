@@ -1,16 +1,94 @@
 import { Logger } from "../Debug/logger.js";
-import { setUpNodeDetailsEvents } from "../Events/CanvasEvents/canvasEvents.js";
+import { setUpAddShapeMenuEvents } from "../Events/CanvasEvents/canvasBarPopupEvents.js";
+
+let canvasManager = null;
+
+function updateCanvasUI(appManager){
+    canvasManager = appManager.canvasManager;
+}
+
+function closeAllPopups(){
+
+    if(canvasManager.popUpOpen){
+        //Lower Center Popup
+        let lowerCenterPopup = document.getElementById('lower-center-popup');
+        lowerCenterPopup.innerHTML = "";
+        if(canvasManager.toggleAddShapeMenu) canvasManager.toggleAddShapeMenu = false;
+        if(canvasManager.toggleSelectOrDragMenu) canvasManager.toggleSelectOrDragMenu = false;
 
 
-function updateCanvasUI(canvasManager){
-    //Set canvas details content
-    //setContentCanvasDetails(canvasManager)
+        canvasManager.popUpOpen = false;
+    }
+    
 
-    //set node details content
-    if (canvasManager.highlightedNode && canvasManager.toggleNodeDetails) {
-        //setContentNodeDetails(canvasManager, canvasManager.highlightedNode);
+    
+}
+
+function toggleAddShapeMenu(){
+    setCanvasManagerInteractionMode("addShape");
+    canvasManager.toggleAddShapeMenu = !canvasManager.toggleAddShapeMenu;
+
+    let lowerCenterPopup = document.getElementById('lower-center-popup');
+
+    if (canvasManager.toggleAddShapeMenu) {
+
+        canvasManager.popUpOpen = true;
+
+        
+        let addShapeButton = document.getElementById('add-shape-button');
+        // Calculate the center point of the addShapeButton
+        var rect = addShapeButton.getBoundingClientRect();
+        var centerX = rect.left + (rect.width / 2);
+        // Convert centerX to string and append 'px', assign as left of popup
+        lowerCenterPopup.style.left = centerX + 'px';
+        lowerCenterPopup.innerHTML = `
+        <button id="elipse-shape-button"><img src="Assets/Images/Icons/ui/Canvas/Lower/Popups/AddShape/elipse.svg" alt="Elipse"></button>
+        <button id="rounded-rectangle-shape-button"><img src="Assets/Images/Icons/ui/Canvas/Lower/Popups/AddShape/rounded-rectangle.svg" alt="Rounded Rectangle"></button>
+        `;
+        setUpAddShapeMenuEvents();
     } else {
-        //setContentNodeDetails(canvasManager);
+        lowerCenterPopup.innerHTML = "";
+    }
+}
+
+function toggleSelectOrDragMenu(){
+    setCanvasManagerInteractionMode("selectCanvas");
+    canvasManager.toggleSelectOrDragMenu = !canvasManager.toggleSelectOrDragMenu;
+
+    let lowerCenterPopup = document.getElementById('lower-center-popup');
+    
+
+    if (canvasManager.toggleSelectOrDragMenu) {
+
+        canvasManager.popUpOpen = true;
+
+        let addShapeButton = document.getElementById('select-or-drag-button');
+        // Calculate the center point of the addShapeButton
+        var rect = addShapeButton.getBoundingClientRect();
+        var centerX = rect.left + (rect.width / 2);
+        // Convert centerX to string and append 'px', assign as left of popup
+        lowerCenterPopup.style.left = centerX + 'px';
+        lowerCenterPopup.innerHTML = `
+        <button id="elipse-shape-button"><img src="Assets/Images/Icons/ui/Canvas/Lower/Popups/AddShape/elipse.svg" alt="Elipse"></button>
+        <button id="rounded-rectangle-shape-button"><img src="Assets/Images/Icons/ui/Canvas/Lower/Popups/AddShape/rounded-rectangle.svg" alt="Rounded Rectangle"></button>
+        `;
+        setUpAddShapeMenuEvents();
+    } else {
+        lowerCenterPopup.innerHTML = "";
+    }
+}
+
+function setCanvasManagerInteractionMode(mode){
+    if(mode == "selectCanvas" || mode == "IM1" || mode == 1){
+        canvasManager.interactionMode = "selectCanvas";
+        document.getElementById("canvas").style.cursor = "url('Assets/Images/Cursors/Select/cursor_select.cur'), url('Assets/Images/Cursors/Select/cursor_select.svg'), auto";
+    }
+    else if(mode == "dragCanvas" || mode == "IM2" || mode == 2){
+        canvasManager.interactionMode = "dragCanvas";
+    }
+    else if(mode == "addShape" || mode == "IM3" || mode == 3){
+        canvasManager.interactionMode = "addShape";
+        document.getElementById("canvas").style.cursor = "url('Assets/Images/Cursors/Crosshair/crosshair.svg') 16 16, auto";
     }
 }
 
@@ -75,7 +153,7 @@ function setContentNodeDetails(canvasManager, node = null) {
             
             document.getElementById('node-details-content-static').innerHTML = nodeDetailsContentStatic;
             
-            setUpNodeDetailsEvents(canvasManager, node);
+            // setUpNodeDetailsEvents(canvasManager, node);
 
         }
     } else {
@@ -88,4 +166,4 @@ function setContentNodeDetails(canvasManager, node = null) {
     document.getElementById('toggle-node-details').innerHTML = toggleNodeDetails;
 }
 
-export { updateCanvasUI };
+export { updateCanvasUI, closeAllPopups, toggleSelectOrDragMenu, toggleAddShapeMenu };
