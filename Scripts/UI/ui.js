@@ -20,10 +20,10 @@ function updateUI (appManager){
 }
 
 function updateStyles(){
-    document.querySelector("body").style.cursor = "url('Assets/Images/Cursors/Select/cursor_select.cur'), url('Assets/Images/Cursors/Select/cursor_select.svg'), auto";
+    document.querySelector("body").style.cursor = "url('Assets/Images/Cursors/Select/cursor_select.svg') 4 4, auto";
     const allButtons = document.querySelectorAll("button");
     allButtons.forEach(button => {
-      button.style.cursor = "url('Assets/Images/Cursors/Pointer/pointer.svg'), pointer";
+      button.style.cursor = "url('Assets/Images/Cursors/Pointer/pointer.svg') 14 1, pointer";
     });
 }
 
@@ -86,7 +86,7 @@ function loadUIDefault(){
     </div>
     <div id="lower-center">
       <button id="select-or-drag-button">
-      <img src="Assets/Images/Icons/ui/Button_Cursor/cursor.svg" alt="Select">
+      <img src="Assets/Images/Icons/ui/Canvas/Lower/Popups/SelectDrag/select.svg" alt="Select">
       </button>
       <button id="add-shape-button">
       <img src="Assets/Images/Icons/ui/Button_Shape/circle.svg" alt="Add Shape">

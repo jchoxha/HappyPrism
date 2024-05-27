@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 800 800">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #f0f0f0;
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        fill: none;
+        stroke: #000;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 66.7px;
+      }
+    </style>
+  </defs>
+  <g id="Layer_2" data-name="Layer 2">
+    <g id="Layer_2-2" data-name="Layer 2">
+      <ellipse class="cls-1" cx="328.9" cy="320.4" rx="135.5" ry="259.3" transform="translate(-130 337.2) rotate(-46.3)"/>
+      <ellipse class="cls-1" cx="499.2" cy="315.4" rx="112.5" ry="203.8" transform="translate(89.8 741) rotate(-78.4)"/>
+      <path class="cls-1" d="M274.9,154c58.9-.5,128.4,124.3,155.1,278.8,26.7,154.4.6,280-58.3,280.4-58.9.5-128.4-124.3-155.1-278.8-26.7-154.4-.6-280,58.3-280.4Z"/>
+    </g>
+  </g>
+  <g id="Layer_1" data-name="Layer 1">
+    <path class="cls-2" d="M575.4,413.4c70.6-37.9,105.8-56.9,114.8-79.7,7.7-19.8,5.6-42.1-5.9-60.1-13.2-20.7-51.5-32.5-128-56.1l-289.4-89.1c-64.6-19.9-96.9-29.8-118.3-21.8-18.6,7-33.1,22-39.5,40.8-7.4,21.6,3.6,53.6,25.5,117.5l97,283.2c26.9,78.7,40.4,118,61.9,130.5,18.6,10.8,41.4,12,61,3.1,22.7-10.3,40.1-48,74.9-123.5l25.7-55.8c5.5-12,8.3-18,12.1-23.3,3.4-4.7,7.3-8.9,11.8-12.5,5-4.1,10.8-7.2,22.5-13.5l73.9-39.7Z"/>
+  </g>
+</svg>

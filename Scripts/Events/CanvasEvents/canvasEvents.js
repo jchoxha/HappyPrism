@@ -1,6 +1,7 @@
 import { Logger } from "../../Debug/logger.js";
 import {setUpCanvasBarEvents, updateCanvasBarEvents} from "./canvasBarEvents.js"
 import { closeAllPopups } from "../../UI/canvasUI.js"
+import { addNode_Shape } from "../../Classes/nodeClass.js";
 
 let canvasManager = null;
 
@@ -100,6 +101,20 @@ function setUpNodeDetailsEvents(canvasManager, node) {
     });
 }
 
+//Keyboard / Mouse shortcuts:
+/*
+
+
+    V: Toggle Select or Drag Canvas / Pan, default to Select first
+    H or hold Space : Drag Canvas / Pan
+    Mouse Wheel: Drag canvas / Pan from point
+    Hold Ctrl + Scroll: Zoom in/out
+    Scroll: Scroll up/down or left/right
+
+
+
+*/
+
 function setUpCanvasPointerEvents(){
     const mouseEvents = ['mousedown', 'mouseup', 'mousemove', 'wheel'];
     const touchEvents = ['touchstart', 'touchend', 'touchmove', 'touchcancel'];
@@ -183,8 +198,15 @@ function handleStart(event) {
     canvasManager.mousePositionOnDown = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y }
     Logger.log("Mouse down at: ", canvasManager.mousePositionOnDown);
     closeAllPopups();
-
     if (canvasManager.interactionMode == "selectCanvas"){
+        //first check to see if we are clicking a canvasObject, 
+        //  if not then we are creating a selection box
+        canvasManager.IM1draggingSelectionBox = true;
+        canvasManager.IM1selectionBoxStartPos = { x: canvasManager.mousePositionOnDown.x, y: canvasManager.mousePositionOnDown.y };
+    }
+
+    if (canvasManager.interactionMode == "dragCanvas"){
+        document.getElementById("canvas").style.cursor = "url('Assets/Images/Cursors/Drag/hand-closed.svg')16 17, auto";
         for (let i = canvasManager.nodes.length - 1; i >= 0; i--) {
             const node = canvasManager.nodes[i];
             if (isMouseOver(node, canvasManager)) {
@@ -233,49 +255,19 @@ function handleStart(event) {
     if (canvasManager.interactionMode == "addShape"){
         canvasManager.IM3draggingShape = true;
         canvasManager.IM3shapeStartPos = { x: canvasManager.mousePositionOnDown.x, y: canvasManager.mousePositionOnDown.y };
-        console.log("Shape start position: ", canvasManager.IM3shapeStartPos);
-        console.log("Visible width and height: ", canvasManager.visibleWidth +", " + canvasManager.visibleHeight);
-        console.log("TranslateX & Y: ", canvasManager.translateX + ", " + canvasManager.translateY);
-        console.log("Canvas Scale: ", canvasManager.scale);
+        // console.log("Shape start position: ", canvasManager.IM3shapeStartPos);
+        // console.log("Visible width and height: ", canvasManager.visibleWidth +", " + canvasManager.visibleHeight);
+        // console.log("TranslateX & Y: ", canvasManager.translateX + ", " + canvasManager.translateY);
+        // console.log("Canvas Scale: ", canvasManager.scale);
     }
 }
-
-function handleEnd(event) {
-    canvasManager.mousePositionOnUp = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y };
-    if (canvasManager.interactionMode == "selectCanvas"){
-        
-        if(canvasManager.draggingCanvas)
-            {
-                canvasManager.draggingCanvas = false;
-                canvasManager.setNeedsUpdating(false);
-            }
-        else{
-            canvasManager.nodes.forEach(node => {
-                if (node.dragging) {
-                    if(canvasManager.physicsEnabled){
-                        if (canvasManager.currentTime > canvasManager.mouseLastMoveTime) {
-                            Logger.log("Node velocity canceled because " + (canvasManager.currentTime - canvasManager.mouseLastMoveTime) + " < 300");
-                            node.vx = 0;
-                            node.vy = 0;
-                        }
-                    }
-                    node.dragging = false;
-                    node.inMovementAfterDragging = true;
-                }
-            });
-        }
-    }
-    if (canvasManager.interactionMode == "addShape" && canvasManager.IM3draggingShape) {
-        canvasManager.IM3draggingShape = false;
-        //addShapeToCanvas(canvasManager);
-    }
-}
-
-
 
 function handleMove(event) {
-
-    if(canvasManager.interactionMode == "selectCanvas"){
+    if (canvasManager.interactionMode == "selectCanvas" && canvasManager.IM1draggingSelectionBox){
+        canvasManager.IM1selectionBoxEndPos = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y };
+        canvasManager.drawTempShape();
+    }
+    if(canvasManager.interactionMode == "dragCanvas"){
         if (canvasManager.draggingCanvas) {
             const dx = (canvasManager.currentmousePos.x - canvasManager.mousePositionOnMoveStart.x) * canvasManager.scale;
             const dy = (canvasManager.currentmousePos.y - canvasManager.mousePositionOnMoveStart.y) * canvasManager.scale;
@@ -318,6 +310,47 @@ function handleMove(event) {
     canvasManager.mouseLastMoveTime = canvasManager.currentTime;
     updateMouseProperties(event, canvasManager);
 }
+
+function handleEnd(event) {
+    canvasManager.mousePositionOnUp = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y };
+    if (canvasManager.interactionMode == "selectCanvas" && canvasManager.IM1draggingSelectionBox){
+        canvasManager.IM1draggingSelectionBox = false;
+        canvasManager.setNeedsUpdating(true, 1);
+    }
+    if (canvasManager.interactionMode == "dragCanvas"){
+        document.getElementById("canvas").style.cursor = "url('Assets/Images/Cursors/Drag/hand-open.svg') 16 16, auto";
+        if(canvasManager.draggingCanvas)
+            {
+                canvasManager.draggingCanvas = false;
+                canvasManager.setNeedsUpdating(false);
+            }
+        else{
+            canvasManager.nodes.forEach(node => {
+                if (node.dragging) {
+                    if(canvasManager.physicsEnabled){
+                        if (canvasManager.currentTime > canvasManager.mouseLastMoveTime) {
+                            Logger.log("Node velocity canceled because " + (canvasManager.currentTime - canvasManager.mouseLastMoveTime) + " < 300");
+                            node.vx = 0;
+                            node.vy = 0;
+                        }
+                    }
+                    node.dragging = false;
+                    node.inMovementAfterDragging = true;
+                }
+            });
+        }
+    }
+    if (canvasManager.interactionMode == "addShape" && canvasManager.IM3draggingShape) {
+            canvasManager.IM3draggingShape = false;
+            console.log("Shape dimensions at mouse up: ", canvasManager.IM3shapeDims);
+            addNode_Shape(canvasManager);
+            canvasManager.setNeedsUpdating(true, 1);
+    }
+}
+
+
+
+
 
 
 
@@ -364,6 +397,7 @@ function handleWheel(event) {
     canvasManager.translateY -= mouseY * (scale - canvasManager.scale);
     
     canvasManager.scale = scale;
+    //Update the canvas once
     canvasManager.setNeedsUpdating(true, 1);
 }
 

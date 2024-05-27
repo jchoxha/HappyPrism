@@ -1,5 +1,5 @@
 import { Logger } from "../../Debug/logger.js";
-
+import {updateCanvasBarPopupEvents} from "./canvasBarPopupEvents.js";
 import { closeAllPopups, toggleSelectOrDragMenu, toggleAddShapeMenu } from "../../UI/canvasUI.js"
 
 let canvasManager = null;
@@ -13,6 +13,7 @@ function setUpCanvasBarEvents(appManager){
 
 function updateCanvasBarEvents(appManager){
     canvasManager = appManager.canvasManager;
+    updateCanvasBarPopupEvents(appManager);
 }
 
 function setUpTopBarEvents() {

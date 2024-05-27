@@ -30,12 +30,7 @@ function loadTippyJS() {
     document.head.appendChild(popperScript);
 }
 
-// Initialize Tippy.js tooltips
-function initializeTippy() {
-    initializeTippySingletons();
-}
-
-const buttonGroups = [
+const canvasUIButtonGroups = [
     { selector: '#top-left button', placement: 'bottom' },
     { selector: '#top-center button', placement: 'bottom' },
     { selector: '#top-right button', placement: 'bottom' },
@@ -44,7 +39,12 @@ const buttonGroups = [
     { selector: '#lower-right button', placement: 'top' }
 ];
 
-function initializeTippySingletons() {
+// Initialize Tippy.js tooltips
+function initializeTippy() {
+    initializeTippySingletons(canvasUIButtonGroups);
+}
+
+function initializeTippySingletons(buttonGroups) {
     buttonGroups.forEach(group => initializeTippyGroup(group.selector, group.placement));
 }
 

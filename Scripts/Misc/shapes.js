@@ -1,6 +1,6 @@
 // shapes.js
 const ShapeType = {
-    CIRCLE: { name: 'circle', numSides: 1, isPolygon: false },
+    ELIPSE: { name: 'elipse', numSides: 1, isPolygon: false },
     TRIANGLE: { name: 'triangle', numSides: 3, isPolygon: true },
     SQUARE: { name: 'square', numSides: 4, isPolygon: true },
     PENTAGON: { name: 'pentagon', numSides: 5, isPolygon: true },

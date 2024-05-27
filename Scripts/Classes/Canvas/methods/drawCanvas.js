@@ -75,24 +75,8 @@ function drawYAxis(canvasManager) {
 }
 
 function drawNode(canvasManager, node) {
-    const { x, y, size } = node;
-    const radius = size / 2;
-    canvasManager.ctx.beginPath();
-    if (node.shapeType.name === 'circle') {
-        drawElipse(canvasManager, x, y, radius);
-    } else if (node.shapeType.isPolygon) {
-        drawPolygon(canvasManager, x, y, node.shapeType.numSides, radius);
-    } else {
-        Logger.error('Cannot draw unknown shape type:', node.shapeType.name);
-    }
-    canvasManager.ctx.closePath();
-    if (node.fillStyle === "solidColor") {
-        canvasManager.ctx.fillStyle = node.fill;
-        canvasManager.ctx.fill();
-    } else {
-        Logger.error("No fill style found for node, using black instead");
-        canvasManager.ctx.fillStyle = "black";
-        canvasManager.ctx.stroke();
+    if (node.shapeType == 'elipse') {
+        drawElipse(canvasManager, node.x, node.y, node.shapeWidth, node.shapeHeight, node.shapeFillColor, node.shapeStrokeWidth, node.shapeStrokeColor);
     }
 }
 
@@ -104,55 +88,90 @@ function drawTemporaryShape(canvasManager) {
     //  so that the temporary shape is not drawn on top of the previous one
     drawCanvas(canvasManager);
     canvasManager.update();
-    const startX = canvasManager.IM3shapeStartPos.x * canvasManager.scale + (canvasManager.translateX);
-    const startY = canvasManager.IM3shapeStartPos.y * canvasManager.scale+ (canvasManager.translateY);
-    const width = (canvasManager.IM3shapeEndPos.x * canvasManager.scale + (canvasManager.translateX) - startX);
-    const height = (canvasManager.IM3shapeEndPos.y * canvasManager.scale +(canvasManager.translateY) - startY);
+    
+    if (canvasManager.interactionMode == "selectCanvas") {
+        const startX = canvasManager.IM1selectionBoxStartPos.x * canvasManager.scale + (canvasManager.translateX);
+        const startY = canvasManager.IM1selectionBoxStartPos.y * canvasManager.scale+ (canvasManager.translateY);
+        const width = (canvasManager.IM1selectionBoxEndPos.x * canvasManager.scale + (canvasManager.translateX) - startX);
+        const height = (canvasManager.IM1selectionBoxEndPos.y * canvasManager.scale +(canvasManager.translateY) - startY);
+        drawRectangle(canvasManager, startX, startY, width, height, "rgba(227, 227, 227, 0.5)", 1, "#898989");
+        
+    }
+    if(canvasManager.interactionMode == "addShape"){
+        let startX = canvasManager.IM3shapeStartPos.x * canvasManager.scale + (canvasManager.translateX);
+        let startY = canvasManager.IM3shapeStartPos.y * canvasManager.scale + (canvasManager.translateY);
+        let width = (canvasManager.IM3shapeEndPos.x * canvasManager.scale + (canvasManager.translateX) - startX);
+        let height = (canvasManager.IM3shapeEndPos.y * canvasManager.scale + (canvasManager.translateY) - startY);
+        if (width != 0 && height != 0) {
+            canvasManager.IM3shapeDims = {x: startX, y: startY, width: width, height: height};
+        }
+        //If we just clicked instead of dragged with the add shape tool,
+        //  we want to draw the shape centered on the click with
+        //  the dimensions we have stored from the previous shape
+        else if (!canvasManager.IM3draggingShape) {
+            width = canvasManager.IM3shapeDims.width;
+            height = canvasManager.IM3shapeDims.height;
+            startX = (canvasManager.currentmousePos.x * canvasManager.scale + (canvasManager.translateX)) - width / 2;
+            startY = (canvasManager.currentmousePos.y * canvasManager.scale+ (canvasManager.translateY)) - height / 2;
+        }
 
-    if (canvasManager.IM3shapeType === "elipse") {
-        drawElipse(canvasManager, startX, startY, width, height);
-    }
-    else if (canvasManager.IM3shapeType === "rectangle") {
-        drawPolygon(canvasManager, startX, startY, 4, Math.abs(width));
-    }
-    ctx.closePath();
-    if (canvasManager.IM3fillStyle == "solidColor") {
-        ctx.fillStyle = canvasManager.IM3fill;
-        ctx.fill();
-    } else {
-        //Logger.error("No fill style found, using black instead");
-        ctx.fillStyle = getRandomColor();
-        ctx.fill();
+        // Adjust coordinates for negative width/height
+        if (width < 0) {
+            startX += width;
+            width = -width;
+        }
+        if (height < 0) {
+            startY += height;
+            height = -height;
+        }
+
+        if (canvasManager.IM3shapeType === "elipse") {
+            drawElipse(canvasManager, startX, startY, width, height, canvasManager.IM3shapeFillColor, canvasManager.IM3shapeStrokeWidth, canvasManager.IM3shapeStrokeColor);
+        }
+        if (canvasManager.IM3shapeType === "rectangle") {
+            drawPolygon(canvasManager, startX, startY, width, height, canvasManager.IM3shapeFillColor, canvasManager.IM3shapeStrokeWidth, canvasManager.IM3shapeStrokeColor);
+        }
     }
 }
 
-function drawElipse(canvasManager, x, y, width, height) {
+function drawElipse(canvasManager, x, y, width, height, fillColor = "white", strokeWidth = 1, strokeColor = "black") {
     const ctx = canvasManager.ctx;
 
     // Adjust coordinates for negative width/height
-    if (width < 0) {
-        x += width;
-        width = -width;
-    }
-    if (height < 0) {
-        y += height;
-        height = -height;
-    }
-    ctx.lineWidth = .1 * ((width + height) / 2);
-    ctx.strokeStyle = "black";
+    ctx.lineWidth = strokeWidth;
+    ctx.strokeStyle = strokeColor;
     ctx.beginPath();
     ctx.ellipse(x + width / 2, y + height / 2, width / 2, height / 2, 0, 0, 2 * Math.PI);
     ctx.stroke();
     ctx.closePath();
+    ctx.fillStyle = fillColor;
+    ctx.fill();
 }
 
+function drawRectangle(canvasManager, x, y, width, height, fillColor = "white", strokeWidth = 1, strokeColor = "black") {
+    const ctx = canvasManager.ctx;
+    ctx.moveTo(x, y);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = strokeColor;
+    ctx.beginPath();
+    ctx.rect(x, y, width, height);
+    ctx.stroke();
+    ctx.closePath();
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+}
 
-
-function drawPolygon(canvasManager, x, y, numSides, radius) {
-    canvasManager.ctx.moveTo(x + radius, y);
+function drawPolygon(canvasManager, x, y, numSides, radius, fillColor = "white", strokeWidth = 1, strokeColor = "black") {
+    const ctx = canvasManager.ctx;
+    ctx.moveTo(x + radius, y);
+    ctx.lineWidth = strokeWidth;
+    ctx.strokeStyle = strokeColor;
     for (let i = 1; i <= numSides; i++) {
-        canvasManager.ctx.lineTo(x + radius * Math.cos(2 * Math.PI * i / numSides), y + radius * Math.sin(2 * Math.PI * i / numSides));
+        ctx.lineTo(x + radius * Math.cos(2 * Math.PI * i / numSides), y + radius * Math.sin(2 * Math.PI * i / numSides));
     }
+    ctx.closePath();
+    ctx.fillStyle = fillColor;
+    ctx.fill();
 }
 
 export { drawCanvas, drawTemporaryShape }

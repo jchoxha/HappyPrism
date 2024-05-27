@@ -1,10 +1,13 @@
 import { Logger } from "../Debug/logger.js";
-import { setUpAddShapeMenuEvents } from "../Events/CanvasEvents/canvasBarPopupEvents.js";
+import { setUpAddShapeMenuEvents, setUpSelectDragMenuEvents } from "../Events/CanvasEvents/canvasBarPopupEvents.js";
 
 let canvasManager = null;
 
 function updateCanvasUI(appManager){
     canvasManager = appManager.canvasManager;
+
+    //Update Canvas UI details
+
 }
 
 function closeAllPopups(){
@@ -24,8 +27,28 @@ function closeAllPopups(){
     
 }
 
+function toggleNodeDetails(node){
+    let lowerCenterPopup = document.getElementById('lower-center-popup');
+    if(node.type == "shape"){
+        canvasManager.popUpOpen = true;
+
+        
+        let lowerCenter = document.getElementById('lower-center');
+        // Calculate the center point of the addShapeButton
+        var rect = lowerCenter.getBoundingClientRect();
+        var centerX = rect.left + (rect.width / 2);
+        // Convert centerX to string and append 'px', assign as left of popup
+        lowerCenterPopup.style.left = centerX + 'px';
+        lowerCenterPopup.innerHTML = `
+        <button id="shape-fill-button"><img src="Assets/Images/Icons/ui/Canvas/Lower/Popups/AddShape/elipse.svg" alt="Elipse"></button>
+        <button id="rounded-rectangle-shape-button"><img src="Assets/Images/Icons/ui/Canvas/Lower/Popups/AddShape/rounded-rectangle.svg" alt="Rounded Rectangle"></button>
+        `;
+        setUpAddShapeMenuEvents();
+    }
+}
+
 function toggleAddShapeMenu(){
-    setCanvasManagerInteractionMode("addShape");
+    canvasManager.setCanvasManagerInteractionMode("addShape");
     canvasManager.toggleAddShapeMenu = !canvasManager.toggleAddShapeMenu;
 
     let lowerCenterPopup = document.getElementById('lower-center-popup');
@@ -52,7 +75,8 @@ function toggleAddShapeMenu(){
 }
 
 function toggleSelectOrDragMenu(){
-    setCanvasManagerInteractionMode("selectCanvas");
+    //Set interaction mode based on whether we were last selecting or dragging
+    canvasManager.setCanvasManagerInteractionMode(canvasManager.lastIM1OrIM2);
     canvasManager.toggleSelectOrDragMenu = !canvasManager.toggleSelectOrDragMenu;
 
     let lowerCenterPopup = document.getElementById('lower-center-popup');
@@ -69,28 +93,24 @@ function toggleSelectOrDragMenu(){
         // Convert centerX to string and append 'px', assign as left of popup
         lowerCenterPopup.style.left = centerX + 'px';
         lowerCenterPopup.innerHTML = `
-        <button id="elipse-shape-button"><img src="Assets/Images/Icons/ui/Canvas/Lower/Popups/AddShape/elipse.svg" alt="Elipse"></button>
-        <button id="rounded-rectangle-shape-button"><img src="Assets/Images/Icons/ui/Canvas/Lower/Popups/AddShape/rounded-rectangle.svg" alt="Rounded Rectangle"></button>
+        <button id="select-canvas-button"><img src="Assets/Images/Icons/ui/Canvas/Lower/Popups/SelectDrag/select.svg" alt="Select"></button>
+        <button id="drag-canvas-button"><img src="Assets/Images/Icons/ui/Canvas/Lower/Popups/SelectDrag/drag.svg" alt="Drag"></button>
         `;
-        setUpAddShapeMenuEvents();
+        if(canvasManager.interactionMode == "selectCanvas"){
+            document.getElementById("drag-canvas-button").classList.remove('button-active');
+            document.getElementById("select-canvas-button").classList.add('button-active');
+        }
+        else if(canvasManager.interactionMode == "dragCanvas"){
+            document.getElementById("select-canvas-button").classList.remove('button-active');
+            document.getElementById("drag-canvas-button").classList.add('button-active');
+        }
+
+        setUpSelectDragMenuEvents();
     } else {
         lowerCenterPopup.innerHTML = "";
     }
 }
 
-function setCanvasManagerInteractionMode(mode){
-    if(mode == "selectCanvas" || mode == "IM1" || mode == 1){
-        canvasManager.interactionMode = "selectCanvas";
-        document.getElementById("canvas").style.cursor = "url('Assets/Images/Cursors/Select/cursor_select.cur'), url('Assets/Images/Cursors/Select/cursor_select.svg'), auto";
-    }
-    else if(mode == "dragCanvas" || mode == "IM2" || mode == 2){
-        canvasManager.interactionMode = "dragCanvas";
-    }
-    else if(mode == "addShape" || mode == "IM3" || mode == 3){
-        canvasManager.interactionMode = "addShape";
-        document.getElementById("canvas").style.cursor = "url('Assets/Images/Cursors/Crosshair/crosshair.svg') 16 16, auto";
-    }
-}
 
 function setContentCanvasDetails(canvasManager) {
     let toggleCanvasDetails = "+";

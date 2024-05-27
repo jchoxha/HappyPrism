@@ -9,7 +9,7 @@ class AppManager {
     constructor() {
 
         //Debug
-        this.debugMode = false;
+        this.debugMode = true;
         Logger.setReturnFullFilePath(false);
         Logger.setDebugMode(this.debugMode);
 

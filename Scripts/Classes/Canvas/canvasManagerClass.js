@@ -1,6 +1,7 @@
 // canvasManager.js
 import { Logger } from '../../Debug/logger.js';
 import { drawCanvas, drawTemporaryShape } from './methods/drawCanvas.js';
+import { getRandomColor } from '../../Misc/colors.js';
 
 class CanvasManager {
     constructor(canvasId) {
@@ -49,14 +50,27 @@ class CanvasManager {
             //Possible values (with Interaction Mode ID Number):
             //selectCanvas (IM1), dragCanvas(IM2), addShape(IM3), 
             this.interactionMode = "selectCanvas";
+
+                //selectCanvas (IM1) properties
+                this.IM1draggingSelectionBox = false;
+                this.IM1selectionBoxStartPos = { x: 0, y: 0 };
+                this.IM1selectionBoxEndPos = { x: 0, y: 0 };
+                //IM1 & IM2 properties
+                this.lastIM1OrIM2 = 1;
                 //addShape (IM3) properties
                     //Possible values: circle, rectangle
                     this.IM3shapeType = "elipse";
+
+                    this.IM3shapeFillColor =  getRandomColor();
+                    this.IM3shapeStrokeColor = "black";
+                    this.IM3shapeStrokeWidth = 1;
+                    this.IM3shapeStrokeStyle = "solid";
+
+                    this.IM3shapeDims = {x: 0, y: 0, width: 0, height: 0};
+
                     this.IM3draggingShape = false;
                     this.IM3shapeStartPos = { x: 0, y: 0 };
                     this.IM3shapeEndPos = { x: 0, y: 0 };
-                    this.IM3fillStyle = null;
-                    this.IM3fill = null;
 
         // CANVAS UI ELEMNENTS
 
@@ -131,6 +145,23 @@ class CanvasManager {
         }
     }
 
+    setCanvasManagerInteractionMode(mode){
+        if(mode == "selectCanvas" || mode == "IM1" || mode == 1){
+            this.interactionMode = "selectCanvas";
+            this.lastIM1OrIM2 = 1;
+            document.getElementById("canvas").style.cursor = "url('Assets/Images/Cursors/Select/cursor_select.svg') 4 4, auto";
+        }
+        else if(mode == "dragCanvas" || mode == "IM2" || mode == 2){
+            this.interactionMode = "dragCanvas";
+            this.lastIM1OrIM2 = 2;
+            document.getElementById("canvas").style.cursor = "url('Assets/Images/Cursors/Drag/hand-open.svg') 16 16, auto";
+        }
+        else if(mode == "addShape" || mode == "IM3" || mode == 3){
+            this.interactionMode = "addShape";
+            document.getElementById("canvas").style.cursor = "url('Assets/Images/Cursors/Crosshair/crosshair.svg') 16.5 16.5, auto";
+        }
+    }
+
 
     resizeCanvas() {
         const rect = canvas.getBoundingClientRect();
@@ -152,6 +183,8 @@ class CanvasManager {
     drawTempShape() {
         drawTemporaryShape(this);
     }
+
+
 }
 
 export { CanvasManager };
