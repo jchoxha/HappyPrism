@@ -1,5 +1,5 @@
 import { Logger } from "../Debug/logger.js";
-import { setUpAddShapeMenuEvents, setUpSelectDragMenuEvents } from "../Events/CanvasEvents/canvasBarPopupEvents.js";
+import { setUpNodeDetailsMenuEvents, setUpAddShapeMenuEvents, setUpSelectDragMenuEvents } from "../Events/CanvasEvents/canvasBarPopupEvents.js";
 
 let canvasManager = null;
 
@@ -27,7 +27,7 @@ function closeAllPopups(){
     
 }
 
-function toggleNodeDetails(node){
+function toggleNodeDetailsMenu(node){
     let lowerCenterPopup = document.getElementById('lower-center-popup');
     if(node.type == "shape"){
         canvasManager.popUpOpen = true;
@@ -40,10 +40,9 @@ function toggleNodeDetails(node){
         // Convert centerX to string and append 'px', assign as left of popup
         lowerCenterPopup.style.left = centerX + 'px';
         lowerCenterPopup.innerHTML = `
-        <button id="shape-fill-button"><img src="Assets/Images/Icons/ui/Canvas/Lower/Popups/AddShape/elipse.svg" alt="Elipse"></button>
-        <button id="rounded-rectangle-shape-button"><img src="Assets/Images/Icons/ui/Canvas/Lower/Popups/AddShape/rounded-rectangle.svg" alt="Rounded Rectangle"></button>
+        <button id="shape-fill-button"><img src="Assets/Images/Icons/ui/Canvas/Lower/Popups/NodeDetails/circle.svg" alt="Fill color"></button>
         `;
-        setUpAddShapeMenuEvents();
+        setUpNodeDetailsMenuEvents();
     }
 }
 
@@ -186,4 +185,4 @@ function setContentNodeDetails(canvasManager, node = null) {
     document.getElementById('toggle-node-details').innerHTML = toggleNodeDetails;
 }
 
-export { updateCanvasUI, closeAllPopups, toggleSelectOrDragMenu, toggleAddShapeMenu };
+export { updateCanvasUI, closeAllPopups, toggleNodeDetailsMenu, toggleSelectOrDragMenu, toggleAddShapeMenu };

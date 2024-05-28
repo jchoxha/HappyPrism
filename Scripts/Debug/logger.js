@@ -4,7 +4,10 @@ const Logger = (function() {
     let returnFullFilePath = false; // New variable to control file path format
 
     function setDebugMode(mode) {
-        debugMode = mode;
+        if (mode){
+            debugMode = "default";
+        }
+        
         if (debugMode == "default") {
             Logger.log('Debug mode enabled && set to default');
             if (returnFullFilePath) {

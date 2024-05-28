@@ -58,7 +58,6 @@ class Node {
     }
     this.fillStyle = "solidColor";
   }
-
 }
 
 function addNode_Shape(canvasManager) {
@@ -95,7 +94,7 @@ function addNode_Shape(canvasManager) {
   }
     
 
-  const newNode = new Node(nodeX, nodeY, "shape");
+  const newNode = new Node(nodeX + width / 2, nodeY + height / 2, "shape");
 
 
   newNode.shapeWidth = width / canvasManager.scale;

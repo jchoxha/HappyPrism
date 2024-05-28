@@ -126,7 +126,7 @@ function drawTemporaryShape(canvasManager) {
         }
 
         if (canvasManager.IM3shapeType === "elipse") {
-            drawElipse(canvasManager, startX, startY, width, height, canvasManager.IM3shapeFillColor, canvasManager.IM3shapeStrokeWidth, canvasManager.IM3shapeStrokeColor);
+            drawElipse(canvasManager, startX + width / 2, startY + height / 2, width, height, canvasManager.IM3shapeFillColor, canvasManager.IM3shapeStrokeWidth, canvasManager.IM3shapeStrokeColor);
         }
         if (canvasManager.IM3shapeType === "rectangle") {
             drawPolygon(canvasManager, startX, startY, width, height, canvasManager.IM3shapeFillColor, canvasManager.IM3shapeStrokeWidth, canvasManager.IM3shapeStrokeColor);
@@ -141,7 +141,7 @@ function drawElipse(canvasManager, x, y, width, height, fillColor = "white", str
     ctx.lineWidth = strokeWidth;
     ctx.strokeStyle = strokeColor;
     ctx.beginPath();
-    ctx.ellipse(x + width / 2, y + height / 2, width / 2, height / 2, 0, 0, 2 * Math.PI);
+    ctx.ellipse(x, y, width / 2, height / 2, 0, 0, 2 * Math.PI);
     ctx.stroke();
     ctx.closePath();
     ctx.fillStyle = fillColor;

@@ -5,6 +5,9 @@ function updateCanvasBarPopupEvents(appManager){
 }
 
 
+function setUpNodeDetailsMenuEvents () {
+}
+
 function setUpAddShapeMenuEvents() {
     
 }
@@ -31,4 +34,4 @@ function setUpSelectDragMenuEvents () {
     });
 }
 
-export { updateCanvasBarPopupEvents, setUpAddShapeMenuEvents, setUpSelectDragMenuEvents}
+export { updateCanvasBarPopupEvents, setUpNodeDetailsMenuEvents, setUpAddShapeMenuEvents, setUpSelectDragMenuEvents}
