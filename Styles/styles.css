@@ -4,6 +4,11 @@
     user-select: none;
     -moz-user-select: none;
 }
+
+button:focus {
+    outline: none;
+}
+
 body {
     margin: 0;
     padding: 0;

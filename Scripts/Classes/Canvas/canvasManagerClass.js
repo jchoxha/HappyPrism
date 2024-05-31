@@ -52,11 +52,19 @@ class CanvasManager {
             this.interactionMode = "selectCanvas";
 
                 //selectCanvas (IM1) properties
+                this.IM1showBoundingBoxNodes = [];
+                this.IM1showEditBoxNodes = [];
+                this.IM1nodesBeingDragged = [];
+
+                this.IM1draggingNodes = false;
+
                 this.IM1draggingSelectionBox = false;
                 this.IM1selectionBoxStartPos = { x: 0, y: 0 };
                 this.IM1selectionBoxEndPos = { x: 0, y: 0 };
                 //IM1 & IM2 properties
                 this.lastIM1OrIM2 = 1;
+                //dragCanvas (IM2) properties
+                this.IM2tempCanvasDrag = false;
                 //addShape (IM3) properties
                     //Possible values: circle, rectangle
                     this.IM3shapeType = "elipse";
@@ -146,15 +154,37 @@ class CanvasManager {
     }
 
     setCanvasManagerInteractionMode(mode){
+
+        
+        
+
         if(mode == "selectCanvas" || mode == "IM1" || mode == 1){
             this.interactionMode = "selectCanvas";
             this.lastIM1OrIM2 = 1;
             document.getElementById("canvas").style.cursor = "url('Assets/Images/Cursors/Select/cursor_select.svg') 4 4, auto";
+
+            const selectButton = document.getElementById("select-canvas-button");
+            const dragButton = document.getElementById("drag-canvas-button");
+            const selectOrDragButton = document.getElementById("select-or-drag-button");
+            if(selectOrDragButton) {
+                const selectOrDragImg = selectOrDragButton.querySelector('img');
+                if(selectOrDragImg){ selectOrDragImg.src = "Assets/Images/Icons/ui/Canvas/Lower/Popups/SelectDrag/select.svg";}
+            }
+            if(dragButton && selectButton) {dragButton.classList.remove('button-active'); selectButton.classList.add('button-active');}
         }
         else if(mode == "dragCanvas" || mode == "IM2" || mode == 2){
             this.interactionMode = "dragCanvas";
             this.lastIM1OrIM2 = 2;
             document.getElementById("canvas").style.cursor = "url('Assets/Images/Cursors/Drag/hand-open.svg') 16 16, auto";
+
+            const selectButton = document.getElementById("select-canvas-button");
+            const dragButton = document.getElementById("drag-canvas-button");
+            const selectOrDragButton = document.getElementById("select-or-drag-button");
+            if(selectOrDragButton) {
+                const selectOrDragImg = selectOrDragButton.querySelector('img');
+                if(selectOrDragImg){ selectOrDragImg.src = "Assets/Images/Icons/ui/Canvas/Lower/Popups/SelectDrag/drag.svg";}
+            }
+            if(dragButton && selectButton) {dragButton.classList.add('button-active'); selectButton.classList.remove('button-active');}
         }
         else if(mode == "addShape" || mode == "IM3" || mode == 3){
             this.interactionMode = "addShape";

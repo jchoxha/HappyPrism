@@ -8,6 +8,7 @@ let canvasManager = null;
 
 function setUpCanvasEvents(appManager){
     canvasManager = appManager.canvasManager;
+    setUpKeyEvents();
     setUpCanvasPointerEvents();
     setUpCanvasBarEvents(appManager);
 }
@@ -114,6 +115,33 @@ function setUpNodeDetailsEvents(canvasManager, node) {
 
 
 */
+function setUpKeyEvents(){
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+}
+
+
+
+function handleKeyDown(event) {
+    // Check if the key pressed is the space bar (key code 32)
+    if (event.code === 'Space' || event.keyCode === 32) {
+        if(canvasManager.interactionMode == "selectCanvas"){
+            canvasManager.IM2tempCanvasDrag = true;
+            canvasManager.setCanvasManagerInteractionMode("dragCanvas");
+        }
+    }
+}
+
+function handleKeyUp(event) {
+    // Check if the key released is the space bar (event.code === 'Space')
+    if (event.code === 'Space') {
+        if(canvasManager.IM2tempCanvasDrag){
+            canvasManager.IM2tempCanvasDrag = false;
+            canvasManager.setCanvasManagerInteractionMode("selectCanvas");
+        }
+        
+    }
+}
 
 function setUpCanvasPointerEvents(){
     const mouseEvents = ['mousedown', 'mouseup', 'mousemove', 'wheel'];
@@ -199,64 +227,66 @@ function handleStart(event) {
     console.log("Mouse down at: ", canvasManager.mousePositionOnDown);
     closeAllPopups();
     if (canvasManager.interactionMode == "selectCanvas"){
-        //first check to see if we are clicking a node, 
-        canvasManager.nodes.forEach(node => {
-            console.log("Checking node: " +  node + " at coordinates: " + node.x + ", " + node.y);
-            if (isMouseOver(node, canvasManager)) {
-                Logger.log("Mouse over: ", node);
-                toggleNodeDetailsMenu(canvasManager, node);
-            }
-        });     
-        //  if not then we are creating a selection box
-        canvasManager.IM1draggingSelectionBox = true;
-        canvasManager.IM1selectionBoxStartPos = { x: canvasManager.mousePositionOnDown.x, y: canvasManager.mousePositionOnDown.y };
-    }
-
-    if (canvasManager.interactionMode == "dragCanvas"){
-        document.getElementById("canvas").style.cursor = "url('Assets/Images/Cursors/Drag/hand-closed.svg')16 17, auto";
+        // //first check to see if we are clicking a node, 
+        // canvasManager.nodes.forEach(node => {
+        //     console.log("Checking node: " +  node + " at coordinates: " + node.x + ", " + node.y);
+        //     if (isMouseOver(node, canvasManager)) {
+        //         Logger.log("Mouse over: ", node);
+        //         toggleNodeDetailsMenu(canvasManager, node);
+        //     }
+        // });
         for (let i = canvasManager.nodes.length - 1; i >= 0; i--) {
             const node = canvasManager.nodes[i];
             if (isMouseOver(node, canvasManager)) {
                 Logger.log("Mouse over: ", node);
-                if (canvasManager.highlightedNode == node && canvasManager.selectedNode != node) {
-                    canvasManager.selectedNode = node;
-                    Logger.log("Node selected: ", node)
-                }
-                else if (canvasManager.selectedNode != node) {
-                    canvasManager.highlightedNode = node;
-                    canvasManager.toggleNodeDetails = true;
-                    canvasManager.nodeDetailsStaticContentInit = false;
-                    Logger.log("Node highlighted: ", node);
-                }
-                if (canvasManager.selectedNode == node){
+
+                canvasManager.IM1nodesBeingDragged.length = 0;
+                node.dragOffsetX = node.x - canvasManager.currentmousePos.x;
+                node.dragOffsetY = node.y - canvasManager.currentmousePos.y;
+                canvasManager.IM1nodesBeingDragged.push(node);
+                canvasManager.draggingNodes = true;
+
+                // if (canvasManager.highlightedNode == node && canvasManager.selectedNode != node) {
+                //     canvasManager.selectedNode = node;
+                //     Logger.log("Node selected: ", node)
+                // }
+                // else if (canvasManager.selectedNode != node) {
+                //     canvasManager.highlightedNode = node;
+                //     canvasManager.toggleNodeDetails = true;
+                //     canvasManager.nodeDetailsStaticContentInit = false;
+                //     Logger.log("Node highlighted: ", node);
+                // }
+                // if (canvasManager.selectedNode == node){
                     
-                    node.dragging = true;
-                    canvasManager.highlightedNode = node;
-                    canvasManager.toggleNodeDetails = true;
-                    canvasManager.nodeDetailsStaticContentInit = false;
-                    canvasManager.mousePositionOnMoveStart.x = canvasManager.currentmousePos.x;
-                    canvasManager.mousePositionOnMoveStart.y = canvasManager.currentmousePos.y;
-                }
+                //     node.dragging = true;
+                //     canvasManager.highlightedNode = node;
+                //     canvasManager.toggleNodeDetails = true;
+                //     canvasManager.nodeDetailsStaticContentInit = false;
+                //     canvasManager.mousePositionOnMoveStart.x = canvasManager.currentmousePos.x;
+                //     canvasManager.mousePositionOnMoveStart.y = canvasManager.currentmousePos.y;
+                // }
                 nodeFound = true;
                 return;  // Stop searching once a node is found
             }
         }
-    
-    
-        // Log the state if no nodes are selected
         if (!nodeFound) {
-            if (!canvasManager.draggingCanvas) {
-                canvasManager.draggingCanvas = true;
-                canvasManager.mousePositionOnMoveStart.x = canvasManager.currentmousePos.x;
-                canvasManager.mousePositionOnMoveStart.y = canvasManager.currentmousePos.y;
-                Logger.log("draggingCanvas: ", canvasManager.draggingCanvas);
-                canvasManager.setNeedsUpdating(true);
-
-            }
-            
-            Logger.log("No node was selected");
+            Logger.log("No node was selected, beginning selection box drag");
             canvasManager.selectedNode = null;
             canvasManager.highlightedNode = null;
+            canvasManager.IM1draggingSelectionBox = true;
+            canvasManager.IM1selectionBoxStartPos = { x: canvasManager.mousePositionOnDown.x, y: canvasManager.mousePositionOnDown.y };
+        }        
+    }
+
+    if (canvasManager.interactionMode == "dragCanvas"){
+        document.getElementById("canvas").style.cursor = "url('Assets/Images/Cursors/Drag/hand-closed.svg')16 17, auto";
+        if (!canvasManager.draggingCanvas) {
+            canvasManager.draggingCanvas = true;
+            canvasManager.mousePositionOnMoveStart.x = canvasManager.currentmousePos.x;
+            canvasManager.mousePositionOnMoveStart.y = canvasManager.currentmousePos.y;
+            Logger.log("draggingCanvas: ", canvasManager.draggingCanvas);
+            canvasManager.setNeedsUpdating(true);
+
         }
     }
     if (canvasManager.interactionMode == "addShape"){
@@ -267,7 +297,14 @@ function handleStart(event) {
 
 function handleMove(event) {
     if (canvasManager.interactionMode == "selectCanvas"){
-        if (canvasManager.IM1draggingSelectionBox){
+        if(canvasManager.draggingNodes){
+            canvasManager.IM1nodesBeingDragged.forEach(node => {
+                node.x = canvasManager.currentmousePos.x + node.dragOffsetX;
+                node.y = canvasManager.currentmousePos.y + node.dragOffsetY;
+            });
+            canvasManager.setNeedsUpdating(true, 1);
+        }
+        else if (canvasManager.IM1draggingSelectionBox){
             canvasManager.IM1selectionBoxEndPos = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y };
             canvasManager.drawTempShape();
         }
@@ -284,7 +321,6 @@ function handleMove(event) {
                 canvasManager.nodes[nodeIndex]
             }
         }
-
     }
     if(canvasManager.interactionMode == "dragCanvas"){
         if (canvasManager.draggingCanvas) {
@@ -333,9 +369,14 @@ function handleMove(event) {
 
 function handleEnd(event) {
     canvasManager.mousePositionOnUp = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y };
-    if (canvasManager.interactionMode == "selectCanvas" && canvasManager.IM1draggingSelectionBox){
+    if (canvasManager.interactionMode == "selectCanvas"){
+        if(canvasManager.draggingNodes){
+            canvasManager.draggingNodes = false;
+        }
+        else if (canvasManager.IM1draggingSelectionBox){
         canvasManager.IM1draggingSelectionBox = false;
         canvasManager.setNeedsUpdating(true, 1);
+        }
     }
     if (canvasManager.interactionMode == "dragCanvas"){
         document.getElementById("canvas").style.cursor = "url('Assets/Images/Cursors/Drag/hand-open.svg') 16 16, auto";
