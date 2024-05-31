@@ -63,7 +63,7 @@ class CanvasManager {
 
                     this.IM3shapeFillColor =  getRandomColor();
                     this.IM3shapeStrokeColor = "black";
-                    this.IM3shapeStrokeWidth = 1;
+                    this.IM3shapeStrokeWidth = 0;
                     this.IM3shapeStrokeStyle = "solid";
 
                     this.IM3shapeDims = {width: 0, height: 0};

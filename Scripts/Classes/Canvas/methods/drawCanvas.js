@@ -112,29 +112,32 @@ function drawTemporaryShape(canvasManager) {
         }
 
         if (canvasManager.IM3shapeType === "elipse") {
-            drawElipse(canvasManager, startX + width / 2, startY + height / 2, width, height, canvasManager.IM3shapeFillColor, canvasManager.IM3shapeStrokeWidth, canvasManager.IM3shapeStrokeColor);
+            drawElipse(canvasManager, startX + width / 2, startY + height / 2, width, height, canvasManager.IM3shapeFillColor, canvasManager.IM3shapeStrokeWidth * canvasManager.scale, canvasManager.IM3shapeStrokeColor);
         }
         if (canvasManager.IM3shapeType === "rectangle") {
-            drawPolygon(canvasManager, startX, startY, width, height, canvasManager.IM3shapeFillColor, canvasManager.IM3shapeStrokeWidth, canvasManager.IM3shapeStrokeColor);
+            drawPolygon(canvasManager, startX, startY, width, height, canvasManager.IM3shapeFillColor, canvasManager.IM3shapeStrokeWidth * canvasManager.scale, canvasManager.IM3shapeStrokeColor);
         }
     }
 }
 
-function drawElipse(canvasManager, x, y, width, height, fillColor = "white", strokeWidth = 1, strokeColor = "black") {
+function drawElipse(canvasManager, x, y, width, height, fillColor = "white", strokeWidth = 0, strokeColor = null) {
     const ctx = canvasManager.ctx;
 
     // Adjust coordinates for negative width/height
-    ctx.lineWidth = strokeWidth;
-    ctx.strokeStyle = strokeColor;
+    
     ctx.beginPath();
     ctx.ellipse(x, y, width / 2, height / 2, 0, 0, 2 * Math.PI);
-    ctx.stroke();
+    if (strokeWidth > 0) {
+        ctx.lineWidth = strokeWidth;
+        ctx.strokeStyle = strokeColor;
+        ctx.stroke();
+    }
     ctx.closePath();
     ctx.fillStyle = fillColor;
     ctx.fill();
 }
 
-function drawRectangle(canvasManager, x, y, width, height, fillColor = "white", strokeWidth = 1, strokeColor = "black") {
+function drawRectangle(canvasManager, x, y, width, height, fillColor = "white", strokeWidth = 0, strokeColor = null) {
     const ctx = canvasManager.ctx;
     ctx.moveTo(x, y);
     ctx.lineWidth = 1;
