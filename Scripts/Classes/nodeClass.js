@@ -3,6 +3,7 @@ import { Logger } from '../Debug/logger.js';
 import { ShapeType } from '../Misc/shapes.js';
 import { getRandomColor, isValidColorString } from '../Misc/colors.js';
 import { generateUUID } from '../Misc/utils.js';
+import { CanvasEvent } from './Canvas/canvasEventClass.js';
 
 class Node {
   constructor(startingX, startingY, type = "shape") {
@@ -58,11 +59,25 @@ class Node {
     }
     this.fillStyle = "solidColor";
   }
+
+  remove(canvasManager) {
+    // if (canvasManager.highlightedNode == node) {
+    //   canvasManager.highlightedNode = null;
+    // }
+    // if (canvasManager.selectedNode == node) {
+    //   canvasManager.selectedNode = null;
+    // }
+    canvasManager.nodes.splice(canvasManager.nodes.indexOf(this), 1);
+  }
 }
 
-function addNode_Shape(canvasManager) {
-  console.log("Adding shape node");
-  console.log("Drawing temporary shape");
+function addNode_Shape(canvasManager, node = null) {
+ 
+  let newNode = null;
+  if(node){
+    newNode = node;
+  }else{
+
   const ctx = canvasManager.ctx;
   let startX = canvasManager.IM3shapeStartPos.x * canvasManager.scale + (canvasManager.translateX);
   let startY = canvasManager.IM3shapeStartPos.y * canvasManager.scale + (canvasManager.translateY);
@@ -85,7 +100,7 @@ function addNode_Shape(canvasManager) {
   
   height /= canvasManager.scale;
 
-  const newNode = new Node(nodeX + width / 2, nodeY + height / 2, "shape");
+  newNode = new Node(nodeX + width / 2, nodeY + height / 2, "shape");
 
 
   newNode.shapeWidth = width;
@@ -97,43 +112,48 @@ function addNode_Shape(canvasManager) {
 
   newNode.positionFixed = false;
 
-  Logger.log("Adding node:", newNode);
-  canvasManager.nodes.push(newNode);
   canvasManager.IM3shapeDims.width = newNode.shapeWidth;
   canvasManager.IM3shapeDims.height = newNode.shapeHeight;
-  console.log(canvasManager.IM3shapeDims);
-  return newNode;
-}
-
-function addNode(canvasManager, nodeType = "shape") {
-
-  if (nodeType === "shape") {
-    
   }
-
-  let startingPosition = canvasManager.mousePositionOnDown;
-  Logger.log("Starting position:", startingPosition);
-
-  const newNode = new Node(startingPosition.x, startingPosition.y);
-  newNode.positionFixed = false;
-
   Logger.log("Adding node:", newNode);
   canvasManager.nodes.push(newNode);
-  if(!canvasManager.toggleNodeDetails) {
-    canvasManager.toggleNodeDetails = !canvasManager.toggleNodeDetails;
-  }
   return newNode;
 }
 
-function removeNode(canvasManager, node) {
-  if (canvasManager.highlightedNode == node) {
-    canvasManager.highlightedNode = null;
+function addNodes(canvasManager, nodes = [], recordEvent = true) {
+  let newCanvasEvent = null;
+  if(recordEvent){newCanvasEvent = new CanvasEvent("addNodes");}
+  //If a new individual node is being added
+  if(nodes == "shape"){
+    const newNode = addNode_Shape(canvasManager);
+    if(recordEvent) {newCanvasEvent.nodes.push(newNode);}
   }
-  if (canvasManager.selectedNode == node) {
-    canvasManager.selectedNode = null;
+  //If multiple, pre-made nodes are being added
+  else if (nodes.length > 0){
+    for (let i = 0; i < nodes.length; i++) {
+      if (nodes[i].type == "shape") {
+        const newNode = addNode_Shape(canvasManager, nodes[i]);
+        if(recordEvent) {newCanvasEvent.nodes.push(newNode);}
+      }  
+    }
   }
-  canvasManager.nodes.splice(canvasManager.nodes.indexOf(node), 1);
+  if(recordEvent) {
+    canvasManager.addHistoryEvent(newCanvasEvent);
+  }
+  canvasManager.setNeedsUpdating(true, 1);
+  return;
+}
+
+function removeNodes(canvasManager, nodes, recordEvent = true) {
+  const newCanvasEvent = null;
+  if(recordEvent){newCanvasEvent =new CanvasEvent("removeNodes");}
+  for (let i = 0; i < nodes.length; i++) {
+    if(recordEvent) {newCanvasEvent.nodes.push(nodes[i]);}
+    nodes[i].remove(canvasManager);
+  }
+  if(recordEvent) {canvasManager.addHistoryEvent(newCanvasEvent);}
+  canvasManager.setNeedsUpdating(true, 1);
 }
 
 
-export { Node, addNode, addNode_Shape, removeNode };
+export { Node, addNodes, removeNodes};

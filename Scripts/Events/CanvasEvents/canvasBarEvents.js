@@ -218,10 +218,12 @@ function handleUserProfileButtonClick(event) {
 function handleUndoButtonClick(event) {
     Logger.log('Undo button clicked');
     handleAllButtonClick(event);
+    canvasManager.handleUndo();
 }
 function handleRedoButtonClick(event) {
     Logger.log('Redo button clicked');
     handleAllButtonClick(event);
+    canvasManager.handleRedo();
 }
 //Lower Center
 function handleSelectOrDragButtonClick(event) {

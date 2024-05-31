@@ -1,7 +1,7 @@
 import { Logger } from "../../Debug/logger.js";
 import {setUpCanvasBarEvents, updateCanvasBarEvents} from "./canvasBarEvents.js"
 import { closeAllPopups, toggleNodeDetailsMenu } from "../../UI/canvasUI.js"
-import { addNode_Shape } from "../../Classes/nodeClass.js";
+import { addNodes } from "../../Classes/nodeClass.js";
 
 let canvasManager = null;
 
@@ -400,9 +400,9 @@ function handleEnd(event) {
                 canvasManager.IM3shapeStartPos = { x: canvasManager.currentmousePos.x - radiusX, y: canvasManager.currentmousePos.y - radiusY };
                 canvasManager.IM3shapeEndPos = { x: canvasManager.currentmousePos.x + radiusX, y: canvasManager.currentmousePos.y + radiusY};
             }
-            addNode_Shape(canvasManager);
+
+            addNodes(canvasManager, "shape");
             canvasManager.IM3draggingShape = false;
-            canvasManager.setNeedsUpdating(true, 1);
     }
 }
 

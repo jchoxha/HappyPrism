@@ -2,6 +2,7 @@
 import { Logger } from '../../Debug/logger.js';
 import { drawCanvas, drawTemporaryShape } from './methods/drawCanvas.js';
 import { getRandomColor } from '../../Misc/colors.js';
+import { addNodes, removeNodes } from '../nodeClass.js';
 
 class CanvasManager {
     constructor(canvasId) {
@@ -45,6 +46,10 @@ class CanvasManager {
         this.currentmouseV = { x: 0, y: 0 };
         this.mouseLastMoveTime = null;
         this.mouseLastMovePos = { x: null, y: null };
+
+        //History
+        this.history = [];
+        this.poppedHistory = [];
 
         //Canvas Interaction Mode
             //Possible values (with Interaction Mode ID Number):
@@ -146,10 +151,10 @@ class CanvasManager {
 
     setNeedsUpdating(needsUpdating, times = 0) {
         this.needsUpdating = needsUpdating;
-        Logger.log('CanvasManager.needsUpdating set to: ', this.needsUpdating);
+        //Logger.log('CanvasManager.needsUpdating set to: ', this.needsUpdating);
         if (times > 0){
             this.numUpdatesScheduled = times;
-            Logger.log('CanvasManager.numUpdatesScheduled set to: ', this.numUpdatesScheduled);
+            //Logger.log('CanvasManager.numUpdatesScheduled set to: ', this.numUpdatesScheduled);
         }
     }
 
@@ -212,6 +217,57 @@ class CanvasManager {
 
     drawTempShape() {
         drawTemporaryShape(this);
+    }
+
+    addHistoryEvent(canvasEvent){
+        this.history.push(canvasEvent);
+        this.poppedHistory = [];
+        Logger.log(`New event pushed to canvas history: ${canvasEvent}, poppedHistory cleared`);
+    }
+
+    handleUndo() {
+        const lastEvent = this.history[this.history.length - 1];
+        if(!lastEvent){
+            Logger.log("No action to undo");
+            return;
+        }
+        const lastAction = lastEvent.action;
+        if(lastAction == "addNodes"){
+            Logger.log("Undoing addNodes action");
+            removeNodes(this, lastEvent.nodes, false);
+            this.poppedHistory.push(lastEvent);
+        }
+        else if(lastAction == "removeNodes"){
+            addNodes(this, lastEvent.nodes, false);
+            this.poppedHistory.push(lastEvent);
+        }
+        else{
+            Logger.error(`Last action ${lastAction} is null or not recognized. Cannot undo.`);
+
+        }
+        
+    }
+
+    handleRedo() {
+        if(this.poppedHistory.length > 0){
+            const lastPoppedEvent = this.poppedHistory[this.poppedHistory.length - 1];
+            if(!lastPoppedEvent){
+                Logger.log("No action to redo");
+                return;
+            }
+            const lastPoppedAction = lastPoppedEvent.action;
+            if(lastPoppedAction == "addNodes"){
+                Logger.log("Redoing addNodes action");
+                addNodes(this, lastPoppedEvent.nodes);
+            }
+            else if(lastPoppedAction == "removeNodes"){
+                removeNodes(this, lastPoppedEvent.nodes);
+            }
+            else{
+                Logger.error(`Last action ${lastPoppedAction} is null or not recognized. Cannot redo.`);
+    
+            }
+        }
     }
 
 
