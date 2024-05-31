@@ -102,20 +102,6 @@ function drawTemporaryShape(canvasManager) {
         let startY = canvasManager.IM3shapeStartPos.y * canvasManager.scale + (canvasManager.translateY);
         let width = (canvasManager.IM3shapeEndPos.x * canvasManager.scale + (canvasManager.translateX) - startX);
         let height = (canvasManager.IM3shapeEndPos.y * canvasManager.scale + (canvasManager.translateY) - startY);
-        if (width != 0 && height != 0) {
-            canvasManager.IM3shapeDims = {x: startX, y: startY, width: width, height: height};
-        }
-        //If we just clicked instead of dragged with the add shape tool,
-        //  we want to draw the shape centered on the click with
-        //  the dimensions we have stored from the previous shape
-        else if (!canvasManager.IM3draggingShape) {
-            width = canvasManager.IM3shapeDims.width;
-            height = canvasManager.IM3shapeDims.height;
-            startX = (canvasManager.currentmousePos.x * canvasManager.scale + (canvasManager.translateX)) - width / 2;
-            startY = (canvasManager.currentmousePos.y * canvasManager.scale+ (canvasManager.translateY)) - height / 2;
-        }
-
-        // Adjust coordinates for negative width/height
         if (width < 0) {
             startX += width;
             width = -width;

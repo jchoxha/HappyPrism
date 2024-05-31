@@ -262,10 +262,6 @@ function handleStart(event) {
     if (canvasManager.interactionMode == "addShape"){
         canvasManager.IM3draggingShape = true;
         canvasManager.IM3shapeStartPos = { x: canvasManager.mousePositionOnDown.x, y: canvasManager.mousePositionOnDown.y };
-        // console.log("Shape start position: ", canvasManager.IM3shapeStartPos);
-        // console.log("Visible width and height: ", canvasManager.visibleWidth +", " + canvasManager.visibleHeight);
-        // console.log("TranslateX & Y: ", canvasManager.translateX + ", " + canvasManager.translateY);
-        // console.log("Canvas Scale: ", canvasManager.scale);
     }
 }
 
@@ -348,26 +344,23 @@ function handleEnd(event) {
                 canvasManager.draggingCanvas = false;
                 canvasManager.setNeedsUpdating(false);
             }
-        // else{
-        //     canvasManager.nodes.forEach(node => {
-        //         if (node.dragging) {
-        //             if(canvasManager.physicsEnabled){
-        //                 if (canvasManager.currentTime > canvasManager.mouseLastMoveTime) {
-        //                     Logger.log("Node velocity canceled because " + (canvasManager.currentTime - canvasManager.mouseLastMoveTime) + " < 300");
-        //                     node.vx = 0;
-        //                     node.vy = 0;
-        //                 }
-        //             }
-        //             node.dragging = false;
-        //             node.inMovementAfterDragging = true;
-        //         }
-        //     });
-        // }
     }
-    if (canvasManager.interactionMode == "addShape" && canvasManager.IM3draggingShape) {
-            canvasManager.IM3draggingShape = false;
-            console.log("Shape dimensions at mouse up: ", canvasManager.IM3shapeDims);
+    if (canvasManager.interactionMode == "addShape") {
+            canvasManager.IM3shapeEndPos = canvasManager.mousePositionOnUp;
+            const buffer = 1;
+            const xDiff = Math.abs(canvasManager.IM3shapeEndPos.x - canvasManager.IM3shapeStartPos.x);
+            const yDiff = Math.abs(canvasManager.IM3shapeEndPos.y - canvasManager.IM3shapeStartPos.y);
+            if(xDiff < buffer && yDiff < buffer){
+                Logger.log(`Difference between shapeStartPos & shapeEndPos (${xDiff}, ${yDiff}) did not exceed buffer of ${buffer}px, using dimensions of last shape`);
+                const radiusX = canvasManager.IM3shapeDims.width / 2;
+                const radiusY = canvasManager.IM3shapeDims.height / 2;
+                console.log("radiusX & y " + radiusX + " "+radiusY);
+
+                canvasManager.IM3shapeStartPos = { x: canvasManager.currentmousePos.x - radiusX, y: canvasManager.currentmousePos.y - radiusY };
+                canvasManager.IM3shapeEndPos = { x: canvasManager.currentmousePos.x + radiusX, y: canvasManager.currentmousePos.y + radiusY};
+            }
             addNode_Shape(canvasManager);
+            canvasManager.IM3draggingShape = false;
             canvasManager.setNeedsUpdating(true, 1);
     }
 }

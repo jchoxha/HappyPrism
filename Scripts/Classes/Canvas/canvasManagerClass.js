@@ -66,7 +66,7 @@ class CanvasManager {
                     this.IM3shapeStrokeWidth = 1;
                     this.IM3shapeStrokeStyle = "solid";
 
-                    this.IM3shapeDims = {x: 0, y: 0, width: 0, height: 0};
+                    this.IM3shapeDims = {width: 0, height: 0};
 
                     this.IM3draggingShape = false;
                     this.IM3shapeStartPos = { x: 0, y: 0 };
