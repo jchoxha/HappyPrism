@@ -5,6 +5,7 @@ let canvasManager = null;
 
 function updateCanvasUI(appManager){
     canvasManager = appManager.canvasManager;
+    updateHistoryUI(canvasManager);
 
     //Update Canvas UI details
 
@@ -107,6 +108,30 @@ function toggleSelectOrDragMenu(){
         setUpSelectDragMenuEvents();
     } else {
         lowerCenterPopup.innerHTML = "";
+    }
+}
+
+function updateHistoryUI(canvasManager){
+    let undoButton = document.getElementById('undo-button-img');
+    let redoButton = document.getElementById('redo-button-img');
+
+    let undoButtonImg = document.getElementById('undo-button-img');
+    let redoButtonImg = document.getElementById('redo-button-img');
+
+    if(canvasManager.history.length == 0){
+        undoButton.disabled = true;
+        undoButtonImg.src = "Assets/Images/Icons/ui/Button_Undo/undo-disabled.svg";
+    } else {
+        undoButton.disabled = false;
+        undoButtonImg.src = "Assets/Images/Icons/ui/Button_Undo/undo.svg";
+    }
+
+    if(canvasManager.poppedHistory.length == 0){
+        redoButton.disabled = true;
+        redoButtonImg.src = "Assets/Images/Icons/ui/Button_Redo/redo-disabled.svg";
+    } else {
+        redoButton.disabled = false;
+        redoButtonImg.src = "Assets/Images/Icons/ui/Button_Redo/redo.svg";
     }
 }
 

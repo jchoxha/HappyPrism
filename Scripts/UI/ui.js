@@ -78,10 +78,10 @@ function loadUIDefault(){
   <div id="lower-bar">
     <div id="lower-left" class = "menuDiv">
       <button id="undo-button">
-      <img src="Assets/Images/Icons/ui/Button_Undo/undo.svg" alt="Undo">
+      <img id="undo-button-img" src="Assets/Images/Icons/ui/Button_Undo/undo.svg" alt="Undo">
       </button>
       <button id="redo-button">
-      <img src="Assets/Images/Icons/ui/Button_Redo/redo.svg" alt="Redo">
+      <img id="redo-button-img" src="Assets/Images/Icons/ui/Button_Redo/redo.svg" alt="Redo">
       </button>
     </div>
     <div id="lower-center">

@@ -35,7 +35,6 @@ canvas {
 }
 
 button:hover {
-    transition: background-color 0.3s;
     background-color: lightgrey;
 }
 
@@ -43,7 +42,20 @@ button {
     margin:3px;
     border-radius: 10px;
     transition: background-color 0.3s;
-    background-color: none;
+    background-color: initial;
+}
+
+button:disabled {
+    background-color: grey; /* Style for the disabled button background */
+    color: darkgrey; /* Style for the disabled button text color */
+    cursor: not-allowed;
+}
+
+/* Disabled button should not have hover styles */
+button:disabled:hover {
+    background-color: grey; /* Match the disabled state background */
+    color: darkgrey; /* Match the disabled state color */
+    cursor: not-allowed; /* Match the disabled state cursor */
 }
 
 .menuBarDiv {

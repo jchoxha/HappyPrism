@@ -1,7 +1,7 @@
 import { Logger } from "../../Debug/logger.js";
 import {setUpCanvasBarEvents, updateCanvasBarEvents} from "./canvasBarEvents.js"
 import { closeAllPopups, toggleNodeDetailsMenu } from "../../UI/canvasUI.js"
-import { addNodes } from "../../Classes/nodeClass.js";
+import { addNodes, moveNodes } from "../../Classes/nodeClass.js";
 
 let canvasManager = null;
 
@@ -227,14 +227,6 @@ function handleStart(event) {
     console.log("Mouse down at: ", canvasManager.mousePositionOnDown);
     closeAllPopups();
     if (canvasManager.interactionMode == "selectCanvas"){
-        // //first check to see if we are clicking a node, 
-        // canvasManager.nodes.forEach(node => {
-        //     console.log("Checking node: " +  node + " at coordinates: " + node.x + ", " + node.y);
-        //     if (isMouseOver(node, canvasManager)) {
-        //         Logger.log("Mouse over: ", node);
-        //         toggleNodeDetailsMenu(canvasManager, node);
-        //     }
-        // });
         for (let i = canvasManager.nodes.length - 1; i >= 0; i--) {
             const node = canvasManager.nodes[i];
             if (isMouseOver(node, canvasManager)) {
@@ -243,28 +235,10 @@ function handleStart(event) {
                 canvasManager.IM1nodesBeingDragged.length = 0;
                 node.dragOffsetX = node.x - canvasManager.currentmousePos.x;
                 node.dragOffsetY = node.y - canvasManager.currentmousePos.y;
+                node.lastX = node.x;
+                node.lastY = node.y;
                 canvasManager.IM1nodesBeingDragged.push(node);
                 canvasManager.draggingNodes = true;
-
-                // if (canvasManager.highlightedNode == node && canvasManager.selectedNode != node) {
-                //     canvasManager.selectedNode = node;
-                //     Logger.log("Node selected: ", node)
-                // }
-                // else if (canvasManager.selectedNode != node) {
-                //     canvasManager.highlightedNode = node;
-                //     canvasManager.toggleNodeDetails = true;
-                //     canvasManager.nodeDetailsStaticContentInit = false;
-                //     Logger.log("Node highlighted: ", node);
-                // }
-                // if (canvasManager.selectedNode == node){
-                    
-                //     node.dragging = true;
-                //     canvasManager.highlightedNode = node;
-                //     canvasManager.toggleNodeDetails = true;
-                //     canvasManager.nodeDetailsStaticContentInit = false;
-                //     canvasManager.mousePositionOnMoveStart.x = canvasManager.currentmousePos.x;
-                //     canvasManager.mousePositionOnMoveStart.y = canvasManager.currentmousePos.y;
-                // }
                 nodeFound = true;
                 return;  // Stop searching once a node is found
             }
@@ -371,6 +345,7 @@ function handleEnd(event) {
     canvasManager.mousePositionOnUp = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y };
     if (canvasManager.interactionMode == "selectCanvas"){
         if(canvasManager.draggingNodes){
+            moveNodes(canvasManager);
             canvasManager.draggingNodes = false;
         }
         else if (canvasManager.IM1draggingSelectionBox){

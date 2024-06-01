@@ -12,6 +12,8 @@
     border: none;
     justify-content: center;
     align-items: center; 
+    margin: 1px;
+    padding: 0;
 }
 
 #lower-left button img {

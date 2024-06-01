@@ -2,7 +2,7 @@
 import { Logger } from '../../Debug/logger.js';
 import { drawCanvas, drawTemporaryShape } from './methods/drawCanvas.js';
 import { getRandomColor } from '../../Misc/colors.js';
-import { addNodes, removeNodes } from '../nodeClass.js';
+import { addNodes, removeNodes, moveNodes } from '../nodeClass.js';
 
 class CanvasManager {
     constructor(canvasId) {
@@ -121,7 +121,7 @@ class CanvasManager {
         //console.log("Attempting to update canvas")
         if(this.needsUpdating) {
 
-
+            
             //Actuall stuff to update///
             this.currentTime = Date.now();
             this.updateCanvasRange();
@@ -219,9 +219,11 @@ class CanvasManager {
         drawTemporaryShape(this);
     }
 
-    addHistoryEvent(canvasEvent){
+    addHistoryEvent(canvasEvent, triggeredByHistory = false){
         this.history.push(canvasEvent);
-        this.poppedHistory = [];
+        if(!triggeredByHistory){
+            this.poppedHistory.length = 0;
+        }
         Logger.log(`New event pushed to canvas history: ${canvasEvent}, poppedHistory cleared`);
     }
 
@@ -234,18 +236,23 @@ class CanvasManager {
         const lastAction = lastEvent.action;
         if(lastAction == "addNodes"){
             Logger.log("Undoing addNodes action");
-            removeNodes(this, lastEvent.nodes, false);
-            this.poppedHistory.push(lastEvent);
+            removeNodes(this, lastEvent.nodes, false, true);
         }
         else if(lastAction == "removeNodes"){
-            addNodes(this, lastEvent.nodes, false);
-            this.poppedHistory.push(lastEvent);
+            Logger.log("Undoing removeNodes action");
+            addNodes(this, lastEvent.nodes, false, true);
+        }
+        else if(lastAction == "moveNodes"){
+            Logger.log("Undoing moveNodes action");
+            moveNodes(this, false, true);
+            
         }
         else{
             Logger.error(`Last action ${lastAction} is null or not recognized. Cannot undo.`);
-
+            return;
         }
-        
+        this.poppedHistory.push(lastEvent);
+        this.history.pop();
     }
 
     handleRedo() {
@@ -258,15 +265,21 @@ class CanvasManager {
             const lastPoppedAction = lastPoppedEvent.action;
             if(lastPoppedAction == "addNodes"){
                 Logger.log("Redoing addNodes action");
-                addNodes(this, lastPoppedEvent.nodes);
+                addNodes(this, lastPoppedEvent.nodes, true, true);
             }
             else if(lastPoppedAction == "removeNodes"){
-                removeNodes(this, lastPoppedEvent.nodes);
+                Logger.log("Redoing removeNodes action");
+                removeNodes(this, lastPoppedEvent.nodes, true, true);
+            }
+            else if(lastPoppedAction == "moveNodes"){
+                Logger.log("Redoing moveNodes action");
+                moveNodes(this, true, true);
             }
             else{
                 Logger.error(`Last action ${lastPoppedAction} is null or not recognized. Cannot redo.`);
-    
+                return;
             }
+            this.poppedHistory.pop();
         }
     }
 

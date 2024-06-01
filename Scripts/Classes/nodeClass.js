@@ -14,8 +14,8 @@ class Node {
     this.type = type;
 
     //Positioning
-    this.x = this.intendedX = this.fixedX = startingX;
-    this.y = this.intendedY = this.fixedY = startingY;
+    this.x = this.intendedX = this.fixedX = this.lastX = startingX;
+    this.y = this.intendedY = this.fixedY = this.lastY = startingY;
 
     //Shape Properties
     this.shapeType = null;
@@ -120,7 +120,7 @@ function addNode_Shape(canvasManager, node = null) {
   return newNode;
 }
 
-function addNodes(canvasManager, nodes = [], recordEvent = true) {
+function addNodes(canvasManager, nodes = [], recordEvent = true, triggeredByHistory = false) {
   let newCanvasEvent = null;
   if(recordEvent){newCanvasEvent = new CanvasEvent("addNodes");}
   //If a new individual node is being added
@@ -138,22 +138,46 @@ function addNodes(canvasManager, nodes = [], recordEvent = true) {
     }
   }
   if(recordEvent) {
-    canvasManager.addHistoryEvent(newCanvasEvent);
+    canvasManager.addHistoryEvent(newCanvasEvent, triggeredByHistory);
   }
   canvasManager.setNeedsUpdating(true, 1);
   return;
 }
 
-function removeNodes(canvasManager, nodes, recordEvent = true) {
-  const newCanvasEvent = null;
-  if(recordEvent){newCanvasEvent =new CanvasEvent("removeNodes");}
+function removeNodes(canvasManager, nodes, recordEvent = true, triggeredByHistory = false) {
+  let newCanvasEvent = null;
+  if(recordEvent){newCanvasEvent = new CanvasEvent("removeNodes");}
   for (let i = 0; i < nodes.length; i++) {
     if(recordEvent) {newCanvasEvent.nodes.push(nodes[i]);}
     nodes[i].remove(canvasManager);
   }
-  if(recordEvent) {canvasManager.addHistoryEvent(newCanvasEvent);}
+  if(recordEvent) {
+    canvasManager.addHistoryEvent(newCanvasEvent, triggeredByHistory);
+  }
+  canvasManager.setNeedsUpdating(true, 1);
+}
+
+function moveNodes(canvasManager, recordEvent = true, triggeredByHistory = false) {
+  let newCanvasEvent = null;
+  if(recordEvent){newCanvasEvent =new CanvasEvent("moveNodes");}
+  const nodesToMove = canvasManager.IM1nodesBeingDragged;
+  for (let i = 0; i < nodesToMove.length; i++) {
+    if(recordEvent) {newCanvasEvent.nodes.push(nodesToMove[i]);}
+    //If the history buttons are doing this, then we just want to swap its current position with its last position
+    if(triggeredByHistory){
+      const tempX = nodesToMove[i].x;
+      const tempY = nodesToMove[i].y;
+      nodesToMove[i].x = nodesToMove[i].lastX;
+      nodesToMove[i].y = nodesToMove[i].lastY;
+      nodesToMove[i].lastX = tempX;
+      nodesToMove[i].lastY = tempY;
+    }
+  }
+  if(recordEvent) {
+    canvasManager.addHistoryEvent(newCanvasEvent, triggeredByHistory);
+  }
   canvasManager.setNeedsUpdating(true, 1);
 }
 
 
-export { Node, addNodes, removeNodes};
+export { Node, addNodes, removeNodes, moveNodes};
