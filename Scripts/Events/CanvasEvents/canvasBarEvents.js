@@ -1,6 +1,6 @@
 import { Logger } from "../../Debug/logger.js";
 import {updateCanvasBarPopupEvents} from "./canvasBarPopupEvents.js";
-import { closeAllPopups, toggleSelectOrDragMenu, toggleAddShapeMenu } from "../../UI/canvasUI.js"
+import { closeAllPopups, toggleHistoryMenu, toggleSelectOrDragMenu, toggleAddShapeMenu } from "../../UI/canvasUI.js"
 
 let canvasManager = null;
 
@@ -28,13 +28,16 @@ function setUpTopBarEvents() {
         'user-profile-button': handleUserProfileButtonClick,
     };
 
-    for (const [id, handler] of Object.entries(buttons)) {
+    for (const [id, clickHandler] of Object.entries(buttons)) {
         const button = document.getElementById(id);
         //need to fix this so it doesn't target all buttons, but nothing is broken for now
         if (button && id !== 'home-button') {  // Exclude home button
             button.addEventListener('mousedown', handleButtonMouseDown);
             button.addEventListener('mouseup', handleButtonMouseUp);
-            button.addEventListener('click', handler);
+            button.addEventListener('click', clickHandler);
+            button.addEventListener('mouseover', handleButtonMouseOver);
+            button.addEventListener('mouseout', handleButtonMouseOut);
+            
         }
     }
 
@@ -130,6 +133,7 @@ function setUpTopBarEvents() {
 
 function setUpLowerBarEvents() {
     const buttons = {
+        'history-button': handleHistoryButtonClick,
         'undo-button': handleUndoButtonClick,
         'redo-button': handleRedoButtonClick,
         'select-or-drag-button': handleSelectOrDragButtonClick,
@@ -142,12 +146,14 @@ function setUpLowerBarEvents() {
         'zoom-in-button': handleZoomInButtonClick,
     };
 
-    for (const [id, handler] of Object.entries(buttons)) {
+    for (const [id, clickHandler] of Object.entries(buttons)) {
         const button = document.getElementById(id);
         if (button) {
             button.addEventListener('mousedown', handleButtonMouseDown);
             button.addEventListener('mouseup', handleButtonMouseUp);
-            button.addEventListener('click', handler);
+            button.addEventListener('click', clickHandler);
+            button.addEventListener('mouseover', handleButtonMouseOver);
+            button.addEventListener('mouseout', handleButtonMouseOut);
         }
     }
 }
@@ -161,6 +167,18 @@ function handleButtonMouseDown(event) {
 function handleButtonMouseUp(event) {
     const button = event.currentTarget;
     button.classList.remove('button-overlay');
+}
+
+function handleButtonMouseOver(event) {
+    const button = event.currentTarget;
+    if (!button.classList.contains('button-disabled')) {
+        button.classList.add('button-hover');
+    } 
+}
+
+function handleButtonMouseOut(event) {
+    const button = event.currentTarget;
+    button.classList.remove('button-hover');
 }
 
 
@@ -215,6 +233,10 @@ function handleUserProfileButtonClick(event) {
 //Lower Bar Button Click Event Handlers
 
 //Lower Left
+function handleHistoryButtonClick(event) {
+    Logger.log('History button clicked');
+    toggleHistoryMenu();
+}
 function handleUndoButtonClick(event) {
     Logger.log('Undo button clicked');
     handleAllButtonClick(event);

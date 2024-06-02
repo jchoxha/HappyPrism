@@ -73,10 +73,15 @@ function loadUIDefault(){
     </div>
   </div>
   <div id="lower-bar-popups">
+  <div id="lower-left-popup" style="url('Assets/Images/Cursors/Select/cursor_select.svg') 4 4, auto">
+  </div>
   <div id="lower-center-popup"></div>
   </div>
   <div id="lower-bar">
     <div id="lower-left" class = "menuDiv">
+      <button id="history-button">
+      <img id="history-button-img" src="Assets/Images/Icons/ui/Canvas/Lower/History/history.svg" alt="View History">
+      </button>
       <button id="undo-button">
       <img id="undo-button-img" src="Assets/Images/Icons/ui/Button_Undo/undo.svg" alt="Undo">
       </button>

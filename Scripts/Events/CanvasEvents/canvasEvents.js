@@ -235,8 +235,8 @@ function handleStart(event) {
                 canvasManager.IM1nodesBeingDragged.length = 0;
                 node.dragOffsetX = node.x - canvasManager.currentmousePos.x;
                 node.dragOffsetY = node.y - canvasManager.currentmousePos.y;
-                node.lastX = node.x;
-                node.lastY = node.y;
+                node.xBeforeMove = node.x;
+                node.yBeforeMove = node.y;
                 canvasManager.IM1nodesBeingDragged.push(node);
                 canvasManager.draggingNodes = true;
                 nodeFound = true;
@@ -266,6 +266,7 @@ function handleStart(event) {
     if (canvasManager.interactionMode == "addShape"){
         canvasManager.IM3draggingShape = true;
         canvasManager.IM3shapeStartPos = { x: canvasManager.mousePositionOnDown.x, y: canvasManager.mousePositionOnDown.y };
+        canvasManager.IM3shapeEndPos = canvasManager.IM3shapeStartPos;
     }
 }
 
@@ -345,6 +346,12 @@ function handleEnd(event) {
     canvasManager.mousePositionOnUp = { x: canvasManager.currentmousePos.x, y: canvasManager.currentmousePos.y };
     if (canvasManager.interactionMode == "selectCanvas"){
         if(canvasManager.draggingNodes){
+            canvasManager.IM1nodesBeingDragged.forEach(node => {
+                if(node.xBeforeMove != node.x || node.yBeforeMove != node.y){
+                    node.positionHistory[node.currentPositionIndex + 1] = { x: node.x, y: node.y };
+                    node.currentPositionIndex++;
+                }
+            });
             moveNodes(canvasManager);
             canvasManager.draggingNodes = false;
         }
@@ -362,7 +369,7 @@ function handleEnd(event) {
             }
     }
     if (canvasManager.interactionMode == "addShape") {
-            canvasManager.IM3shapeEndPos = canvasManager.mousePositionOnUp;
+            //canvasManager.IM3shapeEndPos = canvasManager.mousePositionOnUp;
             const buffer = 1;
             const xDiff = Math.abs(canvasManager.IM3shapeEndPos.x - canvasManager.IM3shapeStartPos.x);
             const yDiff = Math.abs(canvasManager.IM3shapeEndPos.y - canvasManager.IM3shapeStartPos.y);

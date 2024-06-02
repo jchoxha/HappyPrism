@@ -14,8 +14,11 @@ class Node {
     this.type = type;
 
     //Positioning
-    this.x = this.intendedX = this.fixedX = this.lastX = startingX;
-    this.y = this.intendedY = this.fixedY = this.lastY = startingY;
+    this.x = this.intendedX = this.fixedX = this.xBeforeMove = this.startingX = startingX;
+    this.y = this.intendedY = this.fixedY = this.yBeforeMove = this.startingY = startingY;
+    this.positionHistory = [];
+    this.positionHistory[0] = { x: this.x, y: this.y };
+    this.currentPositionIndex = 0;
 
     //Shape Properties
     this.shapeType = null;
@@ -162,18 +165,47 @@ function moveNodes(canvasManager, recordEvent = true, triggeredByHistory = false
   if(recordEvent){newCanvasEvent =new CanvasEvent("moveNodes");}
   const nodesToMove = canvasManager.IM1nodesBeingDragged;
   for (let i = 0; i < nodesToMove.length; i++) {
-    if(recordEvent) {newCanvasEvent.nodes.push(nodesToMove[i]);}
-    //If the history buttons are doing this, then we just want to swap its current position with its last position
-    if(triggeredByHistory){
-      const tempX = nodesToMove[i].x;
-      const tempY = nodesToMove[i].y;
-      nodesToMove[i].x = nodesToMove[i].lastX;
-      nodesToMove[i].y = nodesToMove[i].lastY;
-      nodesToMove[i].lastX = tempX;
-      nodesToMove[i].lastY = tempY;
+    const currentNode = nodesToMove[i];
+    if(recordEvent) {newCanvasEvent.nodes.push(currentNode);}
+    let toPosition = {
+      x: currentNode.x,
+      y: currentNode.y
+    };
+    let fromPosition = {
+      x: currentNode.x,
+      y: currentNode.y
+    };
+    if(triggeredByHistory && currentNode.positionHistory.length > 1){
+      let indexChange = -1;
+      //We check if we are recording the event here because that means we are doing a redo,
+      //and we want to go forward in the position history, not backwards
+      if(recordEvent) {indexChange = 1;}
+      toPosition = {
+          x: currentNode.positionHistory[currentNode.currentPositionIndex + indexChange].x,
+          y: currentNode.positionHistory[currentNode.currentPositionIndex + indexChange].y
+        };
+      fromPosition = {
+          x: currentNode.x,
+          y: currentNode.y
+        };
+      currentNode.x = toPosition.x;
+      currentNode.y = toPosition.y;
+      currentNode.currentPositionIndex += indexChange;
     }
+    else {
+      toPosition = {
+        x: currentNode.x,
+        y: currentNode.y
+      };
+    fromPosition = {
+        x: currentNode.xBeforeMove,
+        y: currentNode.yBeforeMove
+      };
+    }
+    if(recordEvent) {newCanvasEvent.nodesLocationChange.push({fromPos: fromPosition, toPos: toPosition});}
   }
   if(recordEvent) {
+    
     canvasManager.addHistoryEvent(newCanvasEvent, triggeredByHistory);
   }
   canvasManager.setNeedsUpdating(true, 1);

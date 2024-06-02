@@ -1,11 +1,12 @@
 import { Logger } from "../Debug/logger.js";
-import { setUpNodeDetailsMenuEvents, setUpAddShapeMenuEvents, setUpSelectDragMenuEvents } from "../Events/CanvasEvents/canvasBarPopupEvents.js";
+import { setUpHistoryMenuEvents, setUpNodeDetailsMenuEvents, setUpAddShapeMenuEvents, setUpSelectDragMenuEvents } from "../Events/CanvasEvents/canvasBarPopupEvents.js";
+import { formatHistoryTimeStamp, callFunctionEveryMinuteOnTheMinute} from '../Misc/utils.js';
 
 let canvasManager = null;
 
 function updateCanvasUI(appManager){
     canvasManager = appManager.canvasManager;
-    updateHistoryUI(canvasManager);
+    updateHistoryUI();
 
     //Update Canvas UI details
 
@@ -14,6 +15,14 @@ function updateCanvasUI(appManager){
 function closeAllPopups(){
 
     if(canvasManager.popUpOpen){
+        //Lower Left Popup
+        // let lowerLeftPopup = document.getElementById('lower-left-popup');
+        // lowerLeftPopup.innerHTML = "";
+        // lowerLeftPopup.style.display = "none";
+        // if(canvasManager.toggleHistoryMenu) {
+        //     canvasManager.toggleHistoryMenu = false;
+        //     document.getElementById("history-button").classList.remove('button-active');
+        // }
         //Lower Center Popup
         let lowerCenterPopup = document.getElementById('lower-center-popup');
         lowerCenterPopup.innerHTML = "";
@@ -111,30 +120,146 @@ function toggleSelectOrDragMenu(){
     }
 }
 
-function updateHistoryUI(canvasManager){
-    let undoButton = document.getElementById('undo-button-img');
-    let redoButton = document.getElementById('redo-button-img');
+function toggleHistoryMenu(){
+    canvasManager.toggleHistoryMenu = !canvasManager.toggleHistoryMenu;
+    console.log(canvasManager.toggleHistoryMenu);
+    const lowerLeftPopup = document.getElementById('lower-left-popup');
+    if(canvasManager.toggleHistoryMenu){
+        lowerLeftPopup.style.display = "flex";
+        document.getElementById("history-button").classList.add('button-active');
+        updateHistoryMenuUI();
+    } else {
+        document.getElementById("history-button").classList.remove('button-active');
+        lowerLeftPopup.style.display = "none";
+        lowerLeftPopup.innerHTML = "";
+    }
+}
+
+function updateHistoryUI(){
+    updateUndoRedoUI();
+    if(canvasManager.toggleHistoryMenu){
+        callFunctionEveryMinuteOnTheMinute(updateHistoryMenuUI);
+    }
+    
+}
+
+function updateHistoryMenuUI(){
+    if(!canvasManager.history.length == 0){
+    
+    let lowerLeftPopup = document.getElementById('lower-left-popup');
+    lowerLeftPopup.style.display = "flex";
+    lowerLeftPopup.innerHTML = `
+        <div id="history-menu-top-bar">
+            <div id="history-menu-title">History</div>
+        </div>
+        <div id = 'history-menu'></div>
+        `;
+    canvasManager.popUpOpen = true;
+    let historyButton = document.getElementById('history-button');
+    // Calculate the center point of the addShapeButton
+    var rect = historyButton.getBoundingClientRect();
+    // Convert centerX to string and append 'px', assign as left of popup
+    lowerLeftPopup.style.left = historyButton.left + 'px';
+    const historyMenu = document.getElementById('history-menu');
+    canvasManager.history.forEach(event => {
+        const indexOfEvent = canvasManager.history.indexOf(event);
+        historyMenu.innerHTML += `<div class = "history-item" id = history-item-${indexOfEvent}></div>`;
+        const historyItem = document.getElementById(`history-item-${indexOfEvent}`);
+        historyItem.innerHTML = `<div class = "history-item-time">${formatHistoryTimeStamp(event.timeStamp)}</div><div class = "history-item-content"></div>`;
+        const historyItemContent = document.querySelector(`#history-item-${indexOfEvent} .history-item-content`);
+        if(event.action == "addNodes"){
+            event.nodes.forEach(node => {
+                if(node.type == "shape"){
+                    if(node.shapeType == "elipse"){
+                        historyItemContent.innerHTML += `Added elipse`; 
+                    }
+                }
+                historyItemContent.innerHTML += ` at (${Math.round(node.startingX)}, ${Math.round(node.startingY)})`;
+            });
+        }
+        else if(event.action == "removeNodes"){
+            event.nodes.forEach(node => {
+                if(node.type == "shape"){
+                    if(node.shapeType == "elipse"){
+                        console.log("elipse found");
+                        historyItemContent.innerHTML += `Removed elipse`;
+                    }
+                }
+                historyItemContent.innerHTML += ` at (${Math.round(node.x)}, ${Math.round(node.y)})`;
+            });
+        }
+        else if(event.action == "moveNodes"){
+            event.nodes.forEach(node => {
+                const nodeIndex = event.nodes.indexOf(node);
+                const nodePositions = event.nodesLocationChange[nodeIndex];
+                const fromPos = nodePositions.fromPos;
+                const toPos = nodePositions.toPos;
+                if(node.type == "shape"){
+                    if(node.shapeType == "elipse"){
+                        historyItemContent.innerHTML += `Moved elipse`;
+                    }
+                }
+                historyItemContent.innerHTML += ` from (${Math.round(fromPos.x)}, ${Math.round(fromPos.y)}) to (${Math.round(toPos.x)}, ${Math.round(toPos.y)})`;
+                });
+        }
+        
+    });
+    
+    historyMenu.innerHTML +=`<button id="history-menu-clear-button">Clear History</button>`;
+    setUpHistoryMenuEvents();
+    }
+    else{
+        
+        let lowerLeftPopup = document.getElementById('lower-left-popup');
+        lowerLeftPopup.style.display = "none";
+        lowerLeftPopup.innerHTML = "";
+        canvasManager.toggleHistoryMenu = false;
+    
+    }
+}
+
+function updateUndoRedoUI(){
+    let undoButton = document.getElementById('undo-button');
+    let redoButton = document.getElementById('redo-button');
 
     let undoButtonImg = document.getElementById('undo-button-img');
     let redoButtonImg = document.getElementById('redo-button-img');
 
+    let historyButton = document.getElementById('history-button');
+    let historyButtonImg = document.getElementById('history-button-img');
+
     if(canvasManager.history.length == 0){
-        undoButton.disabled = true;
+        undoButton.style.cursor = "url('Assets/Images/Cursors/Select/cursor_select.svg') 4 4, auto";
+        undoButton.classList.add('button-disabled');
+        undoButton.style.backgroundColor = "inherit !important";
         undoButtonImg.src = "Assets/Images/Icons/ui/Button_Undo/undo-disabled.svg";
+
+        historyButton.style.cursor = "url('Assets/Images/Cursors/Select/cursor_select.svg') 4 4, auto";
+        historyButton.classList.add('button-disabled');
+        historyButton.style.backgroundColor = "inherit !important";
+        historyButtonImg.src = "Assets/Images/Icons/ui/Canvas/Lower/History/history-disabled.svg";
+
     } else {
-        undoButton.disabled = false;
+        undoButton.style.cursor = "url('Assets/Images/Cursors/Pointer/pointer.svg') 14 1, pointer"
+        undoButton.classList.remove('button-disabled');
         undoButtonImg.src = "Assets/Images/Icons/ui/Button_Undo/undo.svg";
+
+        historyButton.style.cursor = "url('Assets/Images/Cursors/Pointer/pointer.svg') 14 1, pointer"
+        historyButton.classList.remove('button-disabled');
+        historyButtonImg.src = "Assets/Images/Icons/ui/Canvas/Lower/History/history.svg";
+
     }
 
     if(canvasManager.poppedHistory.length == 0){
-        redoButton.disabled = true;
+        redoButton.style.cursor = "url('Assets/Images/Cursors/Select/cursor_select.svg') 4 4, auto";
+        redoButton.classList.add('button-disabled');
         redoButtonImg.src = "Assets/Images/Icons/ui/Button_Redo/redo-disabled.svg";
     } else {
-        redoButton.disabled = false;
+        redoButton.style.cursor = "url('Assets/Images/Cursors/Pointer/pointer.svg') 14 1, pointer";
+        redoButton.classList.remove('button-disabled');
         redoButtonImg.src = "Assets/Images/Icons/ui/Button_Redo/redo.svg";
     }
 }
-
 
 function setContentCanvasDetails(canvasManager) {
     let toggleCanvasDetails = "+";
@@ -210,4 +335,4 @@ function setContentNodeDetails(canvasManager, node = null) {
     document.getElementById('toggle-node-details').innerHTML = toggleNodeDetails;
 }
 
-export { updateCanvasUI, closeAllPopups, toggleNodeDetailsMenu, toggleSelectOrDragMenu, toggleAddShapeMenu };
+export { updateCanvasUI, closeAllPopups, toggleHistoryMenu, updateHistoryMenuUI, toggleNodeDetailsMenu, toggleSelectOrDragMenu, toggleAddShapeMenu };

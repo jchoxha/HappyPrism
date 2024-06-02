@@ -3,6 +3,7 @@ import { Logger } from '../../Debug/logger.js';
 import { drawCanvas, drawTemporaryShape } from './methods/drawCanvas.js';
 import { getRandomColor } from '../../Misc/colors.js';
 import { addNodes, removeNodes, moveNodes } from '../nodeClass.js';
+import { updateHistoryMenuUI } from '../../UI/canvasUI.js';
 
 class CanvasManager {
     constructor(canvasId) {
@@ -91,7 +92,8 @@ class CanvasManager {
             this.popUpOpen = false;
 
             //Lower Bar
-
+                //History Menu
+                this.toggleHistoryMenu = false;
                 //Select or Drag Menu
                 this.toggleSelectOrDragMenu = false;
                 //AddShapeMenu
@@ -126,6 +128,9 @@ class CanvasManager {
             this.currentTime = Date.now();
             this.updateCanvasRange();
             drawCanvas(this);
+            if(this.toggleHistoryMenu){
+                updateHistoryMenuUI();
+            }
             //End of important update code///
 
             //After first update, set needsUpdating to false
@@ -220,11 +225,17 @@ class CanvasManager {
     }
 
     addHistoryEvent(canvasEvent, triggeredByHistory = false){
+        canvasEvent.time = Date.now();
         this.history.push(canvasEvent);
+        Logger.log(`New event pushed to canvas history: ${canvasEvent}`);
         if(!triggeredByHistory){
             this.poppedHistory.length = 0;
+            for (let i = 0; i < this.nodes.length; i++) {
+                const node = this.nodes[i];
+                node.positionHistory.splice(node.currentPositionIndex + 1);
+            }
+            Logger.log("Popped history cleared");
         }
-        Logger.log(`New event pushed to canvas history: ${canvasEvent}, poppedHistory cleared`);
     }
 
     handleUndo() {

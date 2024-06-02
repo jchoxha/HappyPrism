@@ -100,6 +100,148 @@ align-items: center;
     pointer-events: none; /* If you want the popups to be interactive, remove this line */
 }
 
+#lower-left-popup {
+    
+    position: absolute;
+    bottom: 40px; /* Adjusted to be above the lower bar */
+    margin-bottom: 1vh;
+    left: 1vw;
+    display: none;
+    align-items: center;
+    flex-direction: column;
+    
+    
+    max-width: 500px;
+    max-height: 60vh; /* Set max height */
+    /* Make it scrollable */
+    z-index: 1000;
+    pointer-events: none;
+}
+
+#history-menu-top-bar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 1vh;
+    position: relative;
+}
+
+#history-menu-title {
+    background-color: #ffffff;
+    font-size: 24px;
+    color: #000000;
+    border-radius: 30px;
+    box-shadow:
+        0.9px 1.2px 2.4px rgba(0, 0, 0, 0.062),
+        2.2px 3px 6px rgba(0, 0, 0, 0.089),
+        4.4px 6.2px 12.2px rgba(0, 0, 0, 0.111);
+     /* Optional: Adds space between items */
+    padding: 3px;
+    left: 0;
+    position: relative;
+}
+
+#history-menu-clear-button {
+    background-color: #ffffff;
+    font-size: 12px;
+    color: #666;
+    border-radius: 30px;
+    box-shadow:
+        0.9px 1.2px 2.4px rgba(0, 0, 0, 0.062),
+        2.2px 3px 6px rgba(0, 0, 0, 0.089),
+        4.4px 6.2px 12.2px rgba(0, 0, 0, 0.111);
+     /* Optional: Adds space between items */
+    padding: 3px;
+    margin-top: 1vh;
+    margin-left: auto;
+    position: absolute; /* Positioning at the bottom */
+    bottom: -5vh; /* Aligns the button to the bottom of the top bar */
+    right: 0;
+}
+
+
+/* Scrollbar styles for WebKit browsers */
+#history-menu::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+}
+
+#history-menu::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the scrollbar thumb */
+    border-radius: 6px; /* Rounded corners for the scrollbar thumb */
+    cursor: "url('/Assets/Images/Cursors/Select/cursor_select.svg') 4 4, auto"; /* Custom cursor for the scrollbar thumb */
+}
+
+#history-menu::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Color when hovering over the scrollbar thumb */
+}
+
+#history-menu::-webkit-scrollbar-track {
+    background: #f0f0f0; /* Color of the scrollbar track */
+    border-radius: 6px; /* Rounded corners for the scrollbar track */
+}
+
+#history-menu {
+    pointer-events: auto;
+    background-color: #f0f0f0;
+    box-shadow:
+        0.9px 1.2px 2.4px rgba(0, 0, 0, 0.062),
+        2.2px 3px 6px rgba(0, 0, 0, 0.089),
+        4.4px 6.2px 12.2px rgba(0, 0, 0, 0.111),
+        9.1px 12.8px 25.2px rgba(0, 0, 0, 0.138),
+        25px 35px 69px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 10px;
+    white-space: nowrap;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 10px;
+    
+}
+
+.history-item {
+    display: flex; /* Allows the items to be aligned horizontally */
+    align-items: center; /* Aligns items vertically centered */
+    background-color: transparent;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #333;
+    
+    padding: 5px;
+}
+
+.history-item-time {
+    margin-right: 10px;
+}
+
+.history-item-time, .history-item-content {
+    background-color: #ffffff;
+    font-size: 12px;
+    color: #666;
+    border-radius: 30px;
+    box-shadow:
+        0.9px 1.2px 2.4px rgba(0, 0, 0, 0.062),
+        2.2px 3px 6px rgba(0, 0, 0, 0.089),
+        4.4px 6.2px 12.2px rgba(0, 0, 0, 0.111);
+     /* Optional: Adds space between items */
+    padding: 3px;
+}
+
+.history-item-time:last-child, .history-item-content:last-child {
+    margin-right: 0; /* Removes the margin from the last item */
+}
+
+#lower-left-popup button{
+    pointer-events: auto;
+    border: none;
+}
+
+#lower-left-popup button img{
+    width: 40px;
+    height: 40px; 
+}
+
 #lower-center-popup {
     border-radius: 10px;
     position: absolute;
