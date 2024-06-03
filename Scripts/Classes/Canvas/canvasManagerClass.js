@@ -58,15 +58,16 @@ class CanvasManager {
             this.interactionMode = "selectCanvas";
 
                 //selectCanvas (IM1) properties
-                this.IM1showBoundingBoxNodes = [];
-                this.IM1showEditBoxNodes = [];
+                this.IM1selectedNodes = [];
+                
                 this.IM1nodesBeingDragged = [];
-
                 this.IM1draggingNodes = false;
+                this.IM1movedAfterDraggingNodes = false;
 
                 this.IM1draggingSelectionBox = false;
                 this.IM1selectionBoxStartPos = { x: 0, y: 0 };
                 this.IM1selectionBoxEndPos = { x: 0, y: 0 };
+                this.IM1selectionBoxDetectedNodes = [];
                 //IM1 & IM2 properties
                 this.lastIM1OrIM2 = 1;
                 //dragCanvas (IM2) properties

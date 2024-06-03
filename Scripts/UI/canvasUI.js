@@ -174,7 +174,7 @@ function updateHistoryMenuUI(){
                         historyItemContent.innerHTML += `Added elipse`; 
                     }
                 }
-                historyItemContent.innerHTML += ` at (${Math.round(node.startingX)}, ${Math.round(node.startingY)})`;
+                historyItemContent.innerHTML += ` at (${Math.round(node.startingX)}, ${Math.round(node.startingY)})<br>`;
             });
         }
         else if(event.action == "removeNodes"){
@@ -185,7 +185,7 @@ function updateHistoryMenuUI(){
                         historyItemContent.innerHTML += `Removed elipse`;
                     }
                 }
-                historyItemContent.innerHTML += ` at (${Math.round(node.x)}, ${Math.round(node.y)})`;
+                historyItemContent.innerHTML += ` at (${Math.round(node.x)}, ${Math.round(node.y)})<br>`;
             });
         }
         else if(event.action == "moveNodes"){
@@ -199,7 +199,7 @@ function updateHistoryMenuUI(){
                         historyItemContent.innerHTML += `Moved elipse`;
                     }
                 }
-                historyItemContent.innerHTML += ` from (${Math.round(fromPos.x)}, ${Math.round(fromPos.y)}) to (${Math.round(toPos.x)}, ${Math.round(toPos.y)})`;
+                historyItemContent.innerHTML += ` from (${Math.round(fromPos.x)}, ${Math.round(fromPos.y)}) to (${Math.round(toPos.x)}, ${Math.round(toPos.y)})<br>`;
                 });
         }
         

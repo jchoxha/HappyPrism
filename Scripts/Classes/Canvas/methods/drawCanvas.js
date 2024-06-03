@@ -9,6 +9,15 @@ function drawCanvas(canvasManager) {
     canvasManager.ctx.scale(canvasManager.scale, canvasManager.scale);
     drawGrid(canvasManager);
     canvasManager.nodes.forEach(node => drawNode(canvasManager, node));
+    if (canvasManager.IM1selectedNodes.length > 0) {
+        if (canvasManager.IM1selectedNodes.length > 1) {
+            canvasManager.IM1selectedNodes.forEach(node => drawNodeBoundingBox(canvasManager, node));
+            drawBoundingBoxAroundSelectedNodes(canvasManager);
+        }
+        else {
+            drawNodeBoundingBox(canvasManager, canvasManager.IM1selectedNodes[0]);
+        }
+    }
     canvasManager.ctx.restore();
 }
 
@@ -163,4 +172,102 @@ function drawPolygon(canvasManager, x, y, numSides, radius, fillColor = "white",
     ctx.fill();
 }
 
-export { drawCanvas, drawTemporaryShape }
+function drawTempNodeBoundingBox(canvasManager, node) {
+    const ctx = canvasManager.ctx;
+    ctx.save();
+
+    ctx.strokeStyle = 'lightblue';
+    ctx.lineWidth = 2;
+
+    if (node.shapeType == 'elipse') {
+        const x = node.x * canvasManager.scale + canvasManager.translateX;
+        const y = node.y * canvasManager.scale + canvasManager.translateY;
+        const width = node.shapeWidth * canvasManager.scale;
+        const height = node.shapeHeight * canvasManager.scale;
+
+        ctx.beginPath();
+        ctx.rect(x - width / 2, y - height / 2, width, height);
+        ctx.stroke();
+    }
+
+    ctx.restore();
+}
+
+function drawNodeBoundingBox(canvasManager, node) {
+    const ctx = canvasManager.ctx;
+    ctx.save();
+
+    ctx.strokeStyle = 'lightblue';
+    ctx.lineWidth = 2;
+
+    if (node.shapeType == 'elipse') {
+        const x = node.x;
+        const y = node.y;
+        const width = node.shapeWidth;
+        const height = node.shapeHeight;
+
+        ctx.beginPath();
+        ctx.rect(x - width / 2, y - height / 2, width, height);
+        ctx.stroke();
+    }
+
+    ctx.restore();
+}
+
+function drawBoundingBoxAroundSelectedNodes(canvasManager) {
+    const nodes = canvasManager.IM1selectedNodes;
+    if (nodes.length === 0) return;
+
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+    nodes.forEach(node => {
+        const x = node.x;
+        const y = node.y;
+        const width = node.shapeWidth;
+        const height = node.shapeHeight;
+
+        minX = Math.min(minX, x - width / 2);
+        minY = Math.min(minY, y - height / 2);
+        maxX = Math.max(maxX, x + width / 2);
+        maxY = Math.max(maxY, y + height / 2);
+    });
+
+    const ctx = canvasManager.ctx;
+    ctx.save();
+    ctx.strokeStyle = 'lightblue';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.rect(minX, minY, maxX - minX, maxY - minY);
+    ctx.stroke();
+    ctx.restore();
+}
+
+function drawTempBoundingBoxAroundSelectedNodes(canvasManager) {
+    const nodes = canvasManager.IM1selectionBoxDetectedNodes;
+    if (nodes.length === 0) return;
+
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+    nodes.forEach(node => {
+        const x = node.x * canvasManager.scale + canvasManager.translateX;
+        const y = node.y * canvasManager.scale + canvasManager.translateY;
+        const width = node.shapeWidth * canvasManager.scale;
+        const height = node.shapeHeight * canvasManager.scale;
+
+        minX = Math.min(minX, x - width / 2);
+        minY = Math.min(minY, y - height / 2);
+        maxX = Math.max(maxX, x + width / 2);
+        maxY = Math.max(maxY, y + height / 2);
+    });
+
+    const ctx = canvasManager.ctx;
+    ctx.save();
+    ctx.strokeStyle = 'lightblue';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.rect(minX, minY, maxX - minX, maxY - minY);
+    ctx.stroke();
+    ctx.restore();
+}
+
+export { drawCanvas, drawTemporaryShape, drawTempNodeBoundingBox, drawTempBoundingBoxAroundSelectedNodes}
